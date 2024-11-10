@@ -1,148 +1,157 @@
-use cumsdbms;
+USE cumsdbms;
 
-CREATE TABLE IF NOT EXISTS `admin`(
-	`admin_id` VARCHAR(36) NOT NULL,
-    `name` VARCHAR(255) NOT NULL,
-    `email` VARCHAR(255) NOT NULL UNIQUE,
-    `password` VARCHAR(255) NOT NULL,
-    PRIMARY KEY(`admin_id`)
+CREATE TABLE IF NOT EXISTS `Person` (
+    `PersonID` INT AUTO_INCREMENT,
+    `FirstName` VARCHAR(20) NOT NULL,
+    `LastName` VARCHAR(20) NOT NULL,
+    `Email` VARCHAR(20) NOT NULL UNIQUE,
+    `City` VARCHAR(20),
+    `State` VARCHAR(20),
+    `ZipCode` VARCHAR(10),
+    `DateOfBirth` DATE,
+    PRIMARY KEY (`PersonID`)
 );
 
-CREATE TABLE IF NOT EXISTS `course` (
-	`c_id` VARCHAR(100) NOT NULL UNIQUE,
-	`semester` INT NOT NULL,
-	`name` VARCHAR(255) NOT NULL,
-	`c_type` VARCHAR(255) NOT NULL,
-	`credits` INT NOT NULL,
-	`dept_id` VARCHAR(255) NOT NULL,
-	PRIMARY KEY (`c_id`)
+CREATE TABLE IF NOT EXISTS `Students` (
+    `StudentID` INT AUTO_INCREMENT,
+    `EnrollmentDate` DATE NOT NULL,
+    `PersonID` INT NOT NULL,
+    PRIMARY KEY (`StudentID`),
+    FOREIGN KEY (`PersonID`) REFERENCES `Person`(`PersonID`) ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
-CREATE TABLE IF NOT EXISTS `student` (
-	`s_id` VARCHAR(36) NOT NULL,
-	`s_name` VARCHAR(255) NOT NULL,
-	`gender` VARCHAR(6) NOT NULL,
-	`dob` DATE NOT NULL,
-	`email` VARCHAR(255) NOT NULL UNIQUE,
-	`s_address` VARCHAR(255) NOT NULL,
-	`contact` VARCHAR(12) NOT NULL,
-	`password` VARCHAR(255) NOT NULL,
-	`section` INT NOT NULL,
-	`joining_date` DATE DEFAULT(CURRENT_DATE),
-	`dept_id` VARCHAR(255),	
-	PRIMARY KEY (`s_id`)
+CREATE TABLE IF NOT EXISTS `Faculty` (
+    `FacultyID` INT AUTO_INCREMENT,
+    `DepartmentID` INT NOT NULL,
+    `PersonID` INT NOT NULL,
+    PRIMARY KEY (`FacultyID`),
+    FOREIGN KEY (`DepartmentID`) REFERENCES `Departments`(`DepartmentID`) ON UPDATE CASCADE ON DELETE RESTRICT,
+    FOREIGN KEY (`PersonID`) REFERENCES `Person`(`PersonID`) ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
-CREATE TABLE IF NOT EXISTS `staff` (
-	`st_id` VARCHAR(36) NOT NULL,
-	`st_name` VARCHAR(255) NOT NULL,
-	`gender` VARCHAR(6) NOT NULL,
-	`dob` DATE NOT NULL,
-	`email` VARCHAR(255) NOT NULL UNIQUE,
-	`st_address` VARCHAR(255) NOT NULL,
-	`contact` VARCHAR(12) NOT NULL,
-	`dept_id` VARCHAR(255) NOT NULL,
-	`password` VARCHAR(255) NOT NULL,
-	PRIMARY KEY (`st_id`)
+CREATE TABLE IF NOT EXISTS `Courses` (
+    `CourseID` INT AUTO_INCREMENT,
+    `CourseName` VARCHAR(30) NOT NULL,
+    `Credits` INT NOT NULL,
+    `DepartmentID` INT NOT NULL,
+    PRIMARY KEY (`CourseID`),
+    FOREIGN KEY (`DepartmentID`) REFERENCES `Departments`(`DepartmentID`) ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
-CREATE TABLE IF NOT EXISTS `department` (
-	`dept_id` VARCHAR(255) NOT NULL UNIQUE,
-	`d_name` VARCHAR(255) NOT NULL UNIQUE,
-	PRIMARY KEY (`dept_id`)
+CREATE TABLE IF NOT EXISTS `Departments` (
+    `DepartmentID` INT AUTO_INCREMENT,
+    `DepartmentName` VARCHAR(30) NOT NULL,
+    `Building_Name` VARCHAR(20),
+    PRIMARY KEY (`DepartmentID`)
 );
 
-CREATE TABLE IF NOT EXISTS `fee` (
-	`fee_id` INT NOT NULL AUTO_INCREMENT UNIQUE,
-	`fee_type` VARCHAR(255) NOT NULL,
-	`reciept_no` BINARY NOT NULL ,
-	`date` DATE NOT NULL UNIQUE,
-	`s_id` VARCHAR(36) NOT NULL,
-	PRIMARY KEY (`fee_id`)
+CREATE TABLE IF NOT EXISTS `Exams` (
+    `ExamID` INT AUTO_INCREMENT,
+    `CourseID` INT NOT NULL,
+    `ExamDate` DATE NOT NULL,
+    `TotalMarks` INT NOT NULL,
+    PRIMARY KEY (`ExamID`),
+    FOREIGN KEY (`CourseID`) REFERENCES `Courses`(`CourseID`) ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
-CREATE TABLE IF NOT EXISTS `class` (
-	`class_id` INT NOT NULL AUTO_INCREMENT UNIQUE,
-	`section` INT NOT NULL,
-	`semester` INT NOT NULL,
-	`year` DATE DEFAULT(CURRENT_DATE),
-	`c_id` VARCHAR(100),
-	`st_id` VARCHAR(36) NOT NULL,
-	PRIMARY KEY (`class_id`)
+CREATE TABLE IF NOT EXISTS `Scholarships` (
+    `ScholarshipID` INT AUTO_INCREMENT,
+    `Amount` DECIMAL(10,2) NOT NULL,
+    `EligibilityCriteria` TEXT,
+    PRIMARY KEY (`ScholarshipID`)
 );
 
-CREATE TABLE IF NOT EXISTS `assignment` (
-	`asg_id` INT NOT NULL AUTO_INCREMENT,
-	`day` DATETIME DEFAULT CURRENT_TIMESTAMP,
-	`deadline` DATETIME NOT NULL,
-	`class_id` INT NOT NULL,
-	PRIMARY KEY (`asg_id`)
+CREATE TABLE IF NOT EXISTS `Clubs` (
+    `ClubID` INT AUTO_INCREMENT,
+    `ClubName` VARCHAR(20) NOT NULL,
+    `Description` TEXT,
+    `FacultyAdvisorID` INT,
+    PRIMARY KEY (`ClubID`),
+    FOREIGN KEY (`FacultyAdvisorID`) REFERENCES `Faculty`(`FacultyID`) ON UPDATE CASCADE ON DELETE SET NULL
 );
 
-CREATE TABLE IF NOT EXISTS `attendance` (
-	`s_id` VARCHAR(36) NOT NULL,
-	`date` DATE NOT NULL,
-	`c_id` VARCHAR(100) NOT NULL,
-	`status` BOOLEAN DEFAULT NULL,
-	PRIMARY KEY (`s_id`,`c_id`,`date`)
+CREATE TABLE IF NOT EXISTS `Payments` (
+    `PaymentID` INT AUTO_INCREMENT,
+    `StudentID` INT NOT NULL,
+    `Amount` DECIMAL(10,2) NOT NULL,
+    `PaymentDate` DATE NOT NULL,
+    PRIMARY KEY (`PaymentID`),
+    FOREIGN KEY (`StudentID`) REFERENCES `Students`(`StudentID`) ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
-CREATE TABLE IF NOT EXISTS `marks` (
-	`test_id` INT NOT NULL AUTO_INCREMENT,
-	`tt_marks` INT,
-	`ob_marks` INT,
-	`test_type` INT,
-	`s_id` VARCHAR(36) NOT NULL,
-	PRIMARY KEY (`test_id`)
+CREATE TABLE IF NOT EXISTS `Alumni` (
+    `AlumniID` INT AUTO_INCREMENT,
+    `GraduationDate` DATE NOT NULL,
+    `CurrentJobTitle` VARCHAR(20),
+    `CurrentEmployer` VARCHAR(30),
+    `Name` VARCHAR(20),
+    `Email` VARCHAR(20),
+    `DepartmentID` INT,
+    PRIMARY KEY (`AlumniID`),
+    FOREIGN KEY (`DepartmentID`) REFERENCES `Departments`(`DepartmentID`) ON UPDATE CASCADE ON DELETE SET NULL
 );
 
-CREATE TABLE IF NOT EXISTS `assignment_submission` (
-	`s_id` VARCHAR(36) NOT NULL,
-	`asg_id` INT NOT NULL,
-	PRIMARY KEY (`s_id`,`asg_id`)
+CREATE TABLE IF NOT EXISTS `Parent_Contact` (
+    `StudentID` INT NOT NULL,
+    `ParentName` VARCHAR(20) NOT NULL,
+    `PhoneNumber` VARCHAR(15),
+    `Relationship` VARCHAR(20),
+    PRIMARY KEY (`StudentID`, `ParentName`),
+    FOREIGN KEY (`StudentID`) REFERENCES `Students`(`StudentID`) ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
-CREATE TABLE IF NOT EXISTS `time_table` (
-	`c_id` VARCHAR(100),
-	`st_id` VARCHAR(36) NOT NULL,
-	`section` INT NOT NULL,
-	`day` INT NOT NULL,
-	`start_time` TIME NOT NULL,
-	`end_time` TIME NOT NULL,
-	PRIMARY KEY (`c_id`,`section`,`day`)
+CREATE TABLE IF NOT EXISTS `Internships` (
+    `InternshipID` INT AUTO_INCREMENT,
+    `CompanyName` VARCHAR(20) NOT NULL,
+    PRIMARY KEY (`InternshipID`)
 );
 
-ALTER TABLE `course` ADD CONSTRAINT `course_fk0` FOREIGN KEY (`dept_id`) REFERENCES `department`(`dept_id`) on update cascade on delete restrict;
+CREATE TABLE IF NOT EXISTS `Faculty_Course_Mapping` (
+    `FacultyID` INT NOT NULL,
+    `CourseID` INT NOT NULL,
+    PRIMARY KEY (`FacultyID`, `CourseID`),
+    FOREIGN KEY (`FacultyID`) REFERENCES `Faculty`(`FacultyID`) ON UPDATE CASCADE ON DELETE RESTRICT,
+    FOREIGN KEY (`CourseID`) REFERENCES `Courses`(`CourseID`) ON UPDATE CASCADE ON DELETE RESTRICT
+);
 
-ALTER TABLE `student` ADD CONSTRAINT `student_fk0` FOREIGN KEY (`dept_id`) REFERENCES `department`(`dept_id`) on update cascade on delete restrict;
+CREATE TABLE IF NOT EXISTS `Student_Club_Mapping` (
+    `StudentID` INT NOT NULL,
+    `ClubID` INT NOT NULL,
+    PRIMARY KEY (`StudentID`, `ClubID`),
+    FOREIGN KEY (`StudentID`) REFERENCES `Students`(`StudentID`) ON UPDATE CASCADE ON DELETE RESTRICT,
+    FOREIGN KEY (`ClubID`) REFERENCES `Clubs`(`ClubID`) ON UPDATE CASCADE ON DELETE RESTRICT
+);
 
-ALTER TABLE `staff` ADD CONSTRAINT `staff_fk0` FOREIGN KEY (`dept_id`) REFERENCES `department`(`dept_id`) on update cascade on delete restrict;
+CREATE TABLE IF NOT EXISTS `Scholarship_Student_Mapping` (
+    `StudentID` INT NOT NULL,
+    `ScholarshipID` INT NOT NULL,
+    PRIMARY KEY (`StudentID`, `ScholarshipID`),
+    FOREIGN KEY (`StudentID`) REFERENCES `Students`(`StudentID`) ON UPDATE CASCADE ON DELETE RESTRICT,
+    FOREIGN KEY (`ScholarshipID`) REFERENCES `Scholarships`(`ScholarshipID`) ON UPDATE CASCADE ON DELETE RESTRICT
+);
 
-ALTER TABLE `fee` ADD CONSTRAINT `fee_fk0` FOREIGN KEY (`s_id`) REFERENCES `student`(`s_id`) on update cascade on delete restrict;
+CREATE TABLE IF NOT EXISTS `Student_Course_Mapping` (
+    `StudentID` INT NOT NULL,
+    `CourseID` INT NOT NULL,
+    `Marks` INT,
+    PRIMARY KEY (`StudentID`, `CourseID`),
+    FOREIGN KEY (`StudentID`) REFERENCES `Students`(`StudentID`) ON UPDATE CASCADE ON DELETE RESTRICT,
+    FOREIGN KEY (`CourseID`) REFERENCES `Courses`(`CourseID`) ON UPDATE CASCADE ON DELETE RESTRICT
+);
 
-ALTER TABLE `attendance` ADD CONSTRAINT `attendance_fk0` FOREIGN KEY (`s_id`) REFERENCES `student`(`s_id`) on update cascade on delete restrict;
+CREATE TABLE IF NOT EXISTS `Student_Internship_Mapping` (
+    `StudentID` INT NOT NULL,
+    `InternshipID` INT NOT NULL,
+    `Duration` VARCHAR(50),
+    `Stipend` DECIMAL(10,2),
+    PRIMARY KEY (`StudentID`, `InternshipID`),
+    FOREIGN KEY (`StudentID`) REFERENCES `Students`(`StudentID`) ON UPDATE CASCADE ON DELETE RESTRICT,
+    FOREIGN KEY (`InternshipID`) REFERENCES `Internships`(`InternshipID`) ON UPDATE CASCADE ON DELETE RESTRICT
+);
 
-ALTER TABLE `attendance` ADD CONSTRAINT `attendance_fk1` FOREIGN KEY (`c_id`) REFERENCES `course`(`c_id`) on update cascade on delete restrict;
-
-ALTER TABLE `class` ADD CONSTRAINT `class_fk0` FOREIGN KEY (`c_id`) REFERENCES `course`(`c_id`) on update cascade on delete restrict;
-
-ALTER TABLE `class` ADD CONSTRAINT `class_fk1` FOREIGN KEY (`st_id`) REFERENCES `staff`(`st_id`) on update cascade on delete restrict;
-
-ALTER TABLE `assignment` ADD CONSTRAINT `assignment_fk0` FOREIGN KEY (`class_id`) REFERENCES `class`(`class_id`) on update cascade on delete restrict;
-
-ALTER TABLE `assignment_submission` ADD CONSTRAINT `assignment_submission_fk0` FOREIGN KEY (`s_id`) REFERENCES `student`(`s_id`) on update cascade on delete restrict;
-
-ALTER TABLE `assignment_submission` ADD CONSTRAINT `assignment_submission_fk1` FOREIGN KEY (`asg_id`) REFERENCES `assignment`(`asg_id`) on update cascade on delete restrict;
-
-ALTER TABLE `time_table` ADD CONSTRAINT `time_table_fk0` FOREIGN KEY (`c_id`) REFERENCES `course`(`c_id`) on update cascade on delete restrict;
-
-ALTER TABLE `time_table` ADD CONSTRAINT `time_table_fk1` FOREIGN KEY (`st_id`) REFERENCES `staff`(`st_id`) on update cascade on delete restrict;
-
-alter table admin
-add resetLink varchar(255) default '';
-
-alter table student 
-add resetLink varchar(255) default '';
-
-alter table staff
-add resetLink varchar(255) default '';
+CREATE TABLE IF NOT EXISTS `Person_PhoneNumbers` (
+    `PersonID` INT NOT NULL,
+    `Phone_Number` VARCHAR(15) NOT NULL,
+    PRIMARY KEY (`PersonID`, `Phone_Number`),
+    FOREIGN KEY (`PersonID`) REFERENCES `Person`(`PersonID`) ON UPDATE CASCADE ON DELETE RESTRICT
+);
