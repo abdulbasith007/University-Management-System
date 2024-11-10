@@ -66,59 +66,75 @@ exports.getOverview = async (req, res, next) => {
 // 2. STAFFS
 // 2.1 Add staff
 exports.getAddStaff = async (req, res, next) => {
-  const sql = 'SELECT DepartmentID from departments';
-  const results = await zeroParamPromise(sql);
-  let departments = [];
-  for (let i = 0; i < results.length; ++i) {
-    departments.push(results[i].dept_id);
-  }
-  res.render('Admin/Staff/addStaff', {
-    departments: departments,
-    page_name: 'staff',
-  });
-};
-
-exports.postAddStaff = async (req, res, next) => {
-  const { email } = req.body;
-  const sql1 = 'SELECT count(*) as `count` from faculty where email = ?'; //TODO: email is in person table
-  const count = (await queryParamPromise(sql1, [email]))[0].count;
-  if (count !== 0) {
-    req.flash('error', 'Staff with that email already exists');
-    res.redirect('/admin/addStaff');
-  } else {
-    const {
-      dob,
-      name,
-      gender,
-      department,
-      address,
-      city,
-      postalCode,
-      contact,
-    } = req.body;
-
-    if (contact.length > 11) {
-      req.flash('error', 'Enter a valid phone number');
-      return res.redirect('/admin/addStaff');
+    const sql = 'SELECT DepartmentID from departments';
+    const results = await zeroParamPromise(sql);
+    let departments = [];
+    for (let i = 0; i < results.length; ++i) {
+      departments.push(results[i].DepartmentID);
     }
-
-    // const password = dob.toString().split('-').join('');
-    // const hashedPassword = await bcrypt.hash(password, 8);
-
-    const sql2 = 'INSERT INTO staff SET ?';
-    await queryParamPromise(sql2, {
-      st_id: uuidv4(),
-      st_name: name,
-      gender: gender,
-      dob: dob,
-      email: email,
-      st_address: address + '-' + city + '-' + postalCode,
-      contact: contact,
-      dept_id: department,
+    res.render('Admin/Staff/addStaff', {
+      departments: departments,
+      page_name: 'staff',
     });
-    req.flash('success_msg', 'Staff added successfully');
-    res.redirect('/admin/getAllStaffs');
-  }
+  };
+  
+exports.postAddStaff = async (req, res, next) => {
+    const { email } = req.body;
+    const sql1 = 'SELECT count(*) as `count` FROM person WHERE Email = ?';
+    const count = (await queryParamPromise(sql1, [email]))[0].count;
+    if (count !== 0) {
+        req.flash('error', 'Faculty with that email already exists');
+        res.redirect('/admin/addStaff');
+    } else {
+        const {
+            dob,
+            firstName,
+            lastName,
+            department,
+            address,
+            city,
+            postalCode,
+            contact,
+            state,
+        } = req.body;
+
+        if (contact.length > 11) {
+            req.flash('error', 'Enter a valid phone number');
+            return res.redirect('/admin/addStaff');
+        }
+
+        const personData = {
+            FirstName: firstName,
+            LastName: lastName,
+            Email: email,
+            City: city,
+            State: state,
+            ZipCode: postalCode,
+            DateOfBirth: dob,
+        };
+
+        try {
+            // Insert data into the person table and retrieve the last inserted PersonID
+            const sql2 = 'INSERT INTO person SET ?';
+            const personResult = await queryParamPromise(sql2, personData);
+            const personId = personResult.insertId; // Get the auto-incremented PersonID
+
+            // Insert data into the faculty table with the obtained PersonID
+            const facultyData = {
+                DepartmentID: department,
+                PersonID: personId,
+            };
+            const sql3 = 'INSERT INTO faculty SET ?';
+            await queryParamPromise(sql3, facultyData);
+
+            req.flash('success_msg', 'Faculty added successfully');
+            res.redirect('/admin/getAllStaffs');
+        } catch (error) {
+            console.error("Error inserting faculty:", error);
+            req.flash('error', 'Failed to add faculty');
+            res.redirect('/admin/addStaff');
+        }
+    }
 };
 // 2.2 Get staffs on query
 exports.getRelevantStaff = async (req, res, next) => {
