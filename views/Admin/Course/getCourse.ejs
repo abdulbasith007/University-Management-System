@@ -38,16 +38,18 @@
                                                     <tr>
                                                         <th scope="col">#</th>
                                                         <th scope="col">COURSE NAME</th>
-                                                        <th scope="col">SEMESTER</th>
+                                                        <th scope="col">Credits</th>
+                                                        <th scope="col">Department</th>
                                                         <th scope="col">Manage Course</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="courseTable">
                                                     <% for(var i=0; i < data.length; i++) { %>
                                                     <tr>
-                                                        <th scope="row"><%= data[i].c_id %></th>
-                                                        <td><%= data[i].name %></td>
-                                                        <td><%= data[i].semester %></td>
+                                                        <th scope="row"><%= data[i].CourseID %></th>
+                                                        <td><%= data[i].CourseName %></td>
+                                                        <td><%= data[i].Credits %></td>
+                                                        <td><%= data[i].DepartmentName %></td>
                                                         <td><a href="/admin/settings/course/<%= data[i].c_id %>"
                                                                 class="btn btn-sm btn-primary">Settings</a></td>
                                                     </tr>

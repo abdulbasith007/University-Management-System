@@ -34,44 +34,33 @@
                                             </div>
                                             <div class="card-body">
                                                 <form action="/admin/getCourse" method="POST">
-                                                    <h6 class="heading-small text-muted mb-4">Course Information</h6>
-                                                    <div class="pl-lg-4">
-                                                        <div class="row">
-                                                            <div class="col-lg-6">
-                                                                <div class="form-group">
-                                                                    <label class="form-control-label"
-                                                                        for="semester">Semester</label>
-                                                                    <input type="number" max="8" min="1" id="semester"
-                                                                        name="semester"
-                                                                        class="form-control form-control-alternative"
-                                                                        placeholder="Semester">
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-lg-6">
-                                                                <div class="form-group">
-                                                                    <label class="form-control-label"
-                                                                        for="department">Department</label>
-                                                                    <select class="form-control" id="department"
-                                                                        name="department">
-                                                                        <option>
-                                                                            None
-                                                                        </option>
-                                                                        <% for(const department of departments) { %>
-                                                                            <option>
-                                                                                <%= department %>
-                                                                            </option>
-                                                                            <% } %>
-                                                                    </select>
-                                                                </div>
-                                                            </div>
+                                                  <h6 class="heading-small text-muted mb-4">Course Information</h6>
+                                                  <div class="pl-lg-4">
+                                                    <div class="row">
+                                                      <div class="col-lg-6">
+                                                        <div class="form-group">
+                                                          <label class="form-control-label" for="semester">Semester</label>
+                                                          <input type="number" id="semester" name="semester" class="form-control form-control-alternative" placeholder="Semester" min="1" max="8">
                                                         </div>
+                                                      </div>
+                                                      <div class="col-lg-6">
+                                                        <div class="form-group">
+                                                          <label class="form-control-label" for="department">Department</label>
+                                                          <select class="form-control" id="department" name="department">
+                                                            <option value="None">None</option>
+                                                            <% for (const department of departments) { %>
+                                                              <option value="<%= department.DepartmentID %>"><%= department.DepartmentName %></option>
+                                                            <% } %>
+                                                          </select>
+                                                        </div>
+                                                      </div>
                                                     </div>
-                                                    <hr class="my-4">
-                                                    <button type="submit" class="btn btn-primary btn-block">SEE RELEVANT
-                                                        COURSES</button>
+                                                  </div>
+                                                  <hr class="my-4">
+                                                  <button type="submit" class="btn btn-primary btn-block">SEE RELEVANT COURSES</button>
                                                 </form>
-
-                                            </div>
+                                              </div>
+                                              
                                         </div>
                                     </div>
 

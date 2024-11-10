@@ -561,7 +561,10 @@ exports.postDeptSettings = async (req, res, next) => {
 // 6. COURSE
 // 6.1 Get all courses
 exports.getAllCourse = async (req, res, next) => {
-  const results = await zeroParamPromise('SELECT * FROM course');
+  const sql = `
+    SELECT CourseID, CourseName, Credits, DepartmentName 
+    FROM courses NATURAL JOIN departments`;
+  const results = await zeroParamPromise(sql);
   res.render('Admin/Course/getCourse', {
     data: results,
     page_name: 'courses',
@@ -570,85 +573,70 @@ exports.getAllCourse = async (req, res, next) => {
 
 // 6.2 Get courses on query
 exports.getRelevantCourse = async (req, res, next) => {
-  const results = await zeroParamPromise('SELECT * from department');
-  let departments = [];
-  for (let i = 0; i < results.length; ++i) {
-    departments.push(results[i].dept_id);
-  }
+  const results = await zeroParamPromise('SELECT DepartmentID, DepartmentName FROM departments');
   res.render('Admin/Course/deptSelect', {
-    departments: departments,
+    departments: results,
     page_name: 'courses',
   });
 };
 
 exports.postRelevantCourse = async (req, res, next) => {
-  let { semester, department } = req.body;
-  if (!semester && department === 'None') {
-    const results = await zeroParamPromise('SELECT * FROM course');
-    res.render('Admin/Course/getCourse', {
-      data: results,
-      page_name: 'courses',
-    });
-  } else if (!semester) {
-    const sql = 'SELECT * FROM course WHERE dept_id = ?';
-    const results = await queryParamPromise(sql, [department]);
-    res.render('Admin/Course/getCourse', {
-      data: results,
-      page_name: 'courses',
-    });
-  } else if (department === 'None') {
-    const sql = 'SELECT * FROM course WHERE semester = ?';
-    const results = await queryParamPromise(sql, [semester]);
-    res.render('Admin/Course/getCourse', {
-      data: results,
-      page_name: 'courses',
-    });
-  } else if (semester && department !== 'None') {
-    const sql =
-      'SELECT * FROM course WHERE semester = ? AND dept_id = ? GROUP BY c_id';
-    const results = await queryParamPromise(sql, [semester, department]);
-    res.render('Admin/Course/getCourse', {
-      data: results,
-      page_name: 'courses',
-    });
+  const { semester, department } = req.body;
+
+  let sql = `
+    SELECT CourseID, CourseName, Credits, DepartmentName 
+    FROM courses NATURAL JOIN departments`;
+  const params = [];
+
+  if (department !== 'None') {
+    sql += ` WHERE DepartmentID = ?`;
+    params.push(department);
   }
+  // if (semester) {
+  //   sql += params.length ? ' AND' : ' WHERE';
+  //   sql += ` c.Semester = ?`;
+  //   params.push(semester);
+  // }
+
+  const results = await queryParamPromise(sql, params);
+  res.render('Admin/Course/getCourse', {
+    data: results,
+    page_name: 'courses',
+  });
 };
+
 
 // 6.3 Add course
 exports.getAddCourse = async (req, res, next) => {
-  const results = await zeroParamPromise('SELECT * from department');
-  let departments = [];
-  for (let i = 0; i < results.length; ++i) {
-    departments.push(results[i].dept_id);
-  }
+  const departments = await zeroParamPromise('SELECT DepartmentID, DepartmentName FROM departments');
   res.render('Admin/Course/addCourse', {
     departments,
     page_name: 'courses',
   });
 };
+
 exports.postAddCourse = async (req, res, next) => {
-  let { course, semester, department, credits, c_type } = req.body;
-  const sql1 = 'SELECT COUNT(dept_id) AS size FROM course WHERE dept_id = ?';
-  const results = await queryParamPromise(sql1, [department]);
-  let size = results[0].size + 1;
-  const c_id = department + (size <= 9 ? '0' : '') + size.toString();
-  const sql2 = 'INSERT INTO course SET ?';
-  await queryParamPromise(sql2, {
-    c_id,
-    semester: semester,
-    name: course,
-    c_type: c_type,
-    credits: credits,
-    dept_id: department,
-  });
+  const { course, credits, department } = req.body;
+
+  const courseData = {
+    CourseName: course,
+    Credits: credits,
+    DepartmentID: department,
+  };
+  const sql = 'INSERT INTO courses SET ?';
+  await queryParamPromise(sql, courseData);
+
   req.flash('success_msg', 'Course added successfully');
-  return res.redirect('/admin/getAllCourses');
+  res.redirect('/admin/getAllCourses');
 };
+
+
+
 
 // 6.4 Modify existing courses
 exports.getCourseSettings = async (req, res, next) => {
   const cId = req.params.id;
-  const sql1 = 'SELECT * FROM course WHERE c_id = ?';
+  const sql1 = 'SELECT * FROM courses WHERE c_id = ?';
   const courseData = await queryParamPromise(sql1, [cId]);
   const deptData = await zeroParamPromise('SELECT * from department');
   res.render('Admin/Course/setCourse', {
@@ -661,7 +649,7 @@ exports.getCourseSettings = async (req, res, next) => {
 exports.postCourseSettings = async (req, res, next) => {
   let { course, semester, department, credits, c_type, courseId } = req.body;
   const sql =
-    'UPDATE course SET name = ?, semester = ?, credits = ?, c_type = ?, dept_id = ? WHERE c_id = ?';
+    'UPDATE courses SET name = ?, semester = ?, credits = ?, c_type = ?, dept_id = ? WHERE c_id = ?';
   await queryParamPromise(sql, [
     course,
     semester,
