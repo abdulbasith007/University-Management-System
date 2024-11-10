@@ -1,5 +1,5 @@
 exports.getIndex = (req, res, next) => {
-    res.render('index');
+    res.redirect('/admin/dashboard');
   };
   
   exports.getLanding = (req, res, next) => {
