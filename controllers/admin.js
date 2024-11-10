@@ -661,3 +661,116 @@ exports.postCourseSettings = async (req, res, next) => {
   req.flash('success_msg', 'Course changed successfully!');
   res.redirect('/admin/getAllCourses');
 };
+
+// 1. CLUBS
+// 1.1 Add club
+exports.getAddClub = async (req, res, next) => {
+  const sql = 'SELECT FacultyID, CONCAT(FirstName, " ", LastName) AS Name FROM faculty NATURAL JOIN person';
+  const results = await zeroParamPromise(sql);
+  
+  // Send both FacultyID and Name to the view
+  res.render('Admin/Club/addClub', {
+      facultyAdvisors: results,  // Send the whole array of faculty data
+      page_name: 'clubs',
+  });
+};
+
+exports.postAddClub = async (req, res, next) => {
+  const { clubName, description, facultyAdvisorID } = req.body;
+
+  const sql1 = 'SELECT count(*) as `count` FROM clubs WHERE ClubName = ?';
+  const count = (await queryParamPromise(sql1, [clubName]))[0].count;
+  if (count !== 0) {
+      req.flash('error', 'A club with that name already exists');
+      res.redirect('/admin/addClub');
+  } else {
+      const clubData = {
+          ClubName: clubName,
+          Description: description,
+          FacultyAdvisorID: facultyAdvisorID,
+      };
+
+      try {
+          const sql2 = 'INSERT INTO clubs SET ?';
+          await queryParamPromise(sql2, clubData);
+
+          req.flash('success_msg', 'Club added successfully');
+          res.redirect('/admin/getClubs');
+      } catch (error) {
+          console.error("Error adding club:", error);
+          req.flash('error', 'Failed to add club');
+          res.redirect('/admin/addClub');
+      }
+  }
+};
+
+// 1.2 Get all clubs
+exports.getAllClubs = async (req, res, next) => {
+  const sql = `SELECT ClubID, ClubName, Description, FacultyAdvisorID FROM clubs`;
+  const results = await zeroParamPromise(sql);
+  res.render('Admin/Club/getClubs', { data: results, page_name: 'clubs' });
+};
+
+// 1.3 Modify existing club
+exports.getClubSettings = async (req, res, next) => {
+  const clubID = req.params.id;
+  const sql1 = 'SELECT * FROM clubs WHERE ClubID = ?';
+  const clubData = await queryParamPromise(sql1, [clubID]);
+
+  const results = await zeroParamPromise('SELECT FacultyAdvisorID FROM faculty');
+  let facultyAdvisors = [];
+  for (let i = 0; i < results.length; ++i) {
+      facultyAdvisors.push(results[i].FacultyAdvisorID);
+  }
+
+  res.render('Admin/Club/setClub', {
+      clubData: clubData[0],
+      facultyAdvisors: facultyAdvisors,
+      page_name: 'Club Settings',
+  });
+};
+
+exports.postClubSettings = async (req, res, next) => {
+  const { clubID, clubName, description, facultyAdvisorID } = req.body;
+
+  const sql = 'UPDATE clubs SET ClubName = ?, Description = ?, FacultyAdvisorID = ? WHERE ClubID = ?';
+  await queryParamPromise(sql, [clubName, description, facultyAdvisorID, clubID]);
+
+  req.flash('success_msg', 'Club updated successfully');
+  res.redirect('/admin/getClubs');
+};
+
+// 1.2 Get relevant clubs based on query
+exports.getRelevantClub = async (req, res, next) => {
+  const { facultyAdvisorID } = req.query;
+
+  let sql = 'SELECT ClubID, ClubName, Description, FacultyAdvisorID FROM clubs';
+  let params = [];
+
+  // If a facultyAdvisorID is provided, filter by it
+  if (facultyAdvisorID) {
+    sql += ' WHERE FacultyAdvisorID = ?';
+    params.push(facultyAdvisorID);
+  }
+
+  const results = await queryParamPromise(sql, params);
+  res.render('Admin/Club/getClubs', { data: results, page_name: 'clubs' });
+};
+
+// 1.3 Post relevant clubs based on query
+exports.postRelevantClub = async (req, res, next) => {
+  const { facultyAdvisorID } = req.body;
+
+  if (facultyAdvisorID === 'None') {
+    req.flash('error', 'Please select a faculty advisor');
+    res.redirect('/admin/getClubs');
+  } else {
+    const sql = 'SELECT ClubID, ClubName, Description, FacultyAdvisorID FROM clubs WHERE FacultyAdvisorID = ?';
+    const results = await queryParamPromise(sql, [facultyAdvisorID]);
+    
+    res.render('Admin/Club/getClubs', {
+      data: results,
+      page_name: 'clubs',
+    });
+  }
+};

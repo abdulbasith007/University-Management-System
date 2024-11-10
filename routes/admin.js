@@ -70,4 +70,96 @@ router.post('/addCourse', controller.postAddCourse);
 router.get('/settings/course/:id', controller.getCourseSettings);
 router.post('/settings/course', controller.postCourseSettings);
 
+// 7.CLUBS
+// 7.1 Get all clubs
+router.get('/getAllClubs', controller.getAllClubs);
+// 7.2 Get clubs on query
+router.get('/getClubs', controller.getRelevantClub);
+router.post('/getClubs', controller.postRelevantClub);
+// 7.3 Add club
+router.get('/addClub', controller.getAddClub);
+router.post('/addClub', controller.postAddClub);
+// 7.4 Modify existing clubs
+router.get('/settings/club/:id', controller.getClubSettings);
+router.post('/settings/club', controller.postClubSettings);
+
+// // 8.SCHOLARSHIPS
+// // 8.1 Get all scholarships
+// router.get('/getAllScholarships', controller.getAllScholarships);
+// // 8.2 Get scholarships on query
+// router.get('/getScholarship', controller.getRelevantScholarship);
+// router.post('/getScholarship', controller.postRelevantScholarship);
+// // 8.3 Add scholarship
+// router.get('/addScholarship', controller.getAddScholarship);
+// router.post('/addScholarship', controller.postAddScholarship);
+// // 8.4 Modify existing scholarships
+// router.get('/settings/scholarship/:id', controller.getScholarshipSettings);
+// router.post('/settings/scholarship', controller.postScholarshipSettings);
+
+// // 9.INTERNSHIPS
+// // 9.1 Get all internships
+// router.get('/getAllInternships', controller.getAllInternships);
+// // 9.2 Get internships on query
+// router.get('/getInternship', controller.getRelevantInternship);
+// router.post('/getInternship', controller.postRelevantInternship);
+// // 9.3 Add internship
+// router.get('/addInternship', controller.getAddInternship);
+// router.post('/addInternship', controller.postAddInternship);
+// // 9.4 Modify existing internships
+// router.get('/settings/internship/:id', controller.getInternshipSettings);
+// router.post('/settings/internship', controller.postInternshipSettings);
+
+// // 10.PAYMENTS
+// // 10.1 Get all payments
+// router.get('/getAllPayments', controller.getAllPayments);
+// // 10.2 Get payments on query
+// router.get('/getPayment', controller.getRelevantPayment);
+// router.post('/getPayment', controller.postRelevantPayment);
+// // 10.3 Add payment
+// router.get('/addPayment', controller.getAddPayment);
+// router.post('/addPayment', controller.postAddPayment);
+// // 10.4 Modify existing payments
+// router.get('/settings/payment/:id', controller.getPaymentSettings);
+// router.post('/settings/payment', controller.postPaymentSettings);
+
+// // 11.EXAMS
+// // 11.1 Get all exams
+// router.get('/getAllExams', controller.getAllExams);
+// // 11.2 Get exams on query
+// router.get('/getExam', controller.getRelevantExam);
+// router.post('/getExam', controller.postRelevantExam);
+// // 11.3 Add exam
+// router.get('/addExam', controller.getAddExam);
+// router.post('/addExam', controller.postAddExam);
+// // 11.4 Modify existing exams
+// router.get('/settings/exam/:id', controller.getExamSettings);
+// router.post('/settings/exam', controller.postExamSettings);
+
+// // 12.ALUMNI
+// // 12.1 Get all alumni
+// router.get('/getAllAlumni', controller.getAllAlumni);
+// // 12.2 Get alumni on query
+// router.get('/getAlumni', controller.getRelevantAlumni);
+// router.post('/getAlumni', controller.postRelevantAlumni);
+// // 12.3 Add alumni
+// router.get('/addAlumni', controller.getAddAlumni);
+// router.post('/addAlumni', controller.postAddAlumni);
+// // 12.4 Modify existing alumni
+// router.get('/settings/alumni/:id', controller.getAlumniSettings);
+// router.post('/settings/alumni', controller.postAlumniSettings);
+
+// // 13.PARENTS
+// // 13.1 Get all parents
+// router.get('/getAllParents', controller.getAllParents);
+// // 13.2 Get parents on query
+// router.get('/getParent', controller.getRelevantParent);
+// router.post('/getParent', controller.postRelevantParent);
+// // 13.3 Add parent
+// router.get('/addParent', controller.getAddParent);
+// router.post('/addParent', controller.postAddParent);
+// // 13.4 Modify existing parents
+// router.get('/settings/parent/:id', controller.getParentSettings);
+// router.post('/settings/parent', controller.postParentSettings);
+
+
 module.exports = router;

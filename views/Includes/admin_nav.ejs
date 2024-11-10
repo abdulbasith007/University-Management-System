@@ -65,17 +65,77 @@
             </div>
         </li>
 
-        <li class="<% if (page_name === 'depts') { %>
+        <li class="<% if (page_name === 'clubs') { %>
             dropdown active
             <%} else { %>
             dropdown
             <% } %>">
-            <a class="ddbtn" href="#"><i class="fa fa-school"></i>Manage Dept.</a>
+            <a class="ddbtn" href="#"><i class="fa fa-school"></i>Manage Clubs</a>
             <div class="dropdown-content">
-                <a href="/admin/addDept">Add New Department</a>
-                <a href="/admin/getDept">Department Settings</a>
+                <a href="/admin/addClub">Add New Club</a>
+                <a href="/admin/getClubs">Club Settings</a>
             </div>
         </li>
+
+        <li class="<% if (page_name === 'scholarships') { %>
+            dropdown active
+            <%} else { %>
+            dropdown
+            <% } %>">
+            <a class="ddbtn" href="#"><i class="fa fa-school"></i>Manage Scholarships</a>
+            <div class="dropdown-content">
+                <a href="/admin/addScholarship">Add New scholarship</a>
+                <a href="/admin/getScholarships">Scholarship Settings</a>
+            </div>
+        </li>
+
+        <li class="<% if (page_name === 'payments') { %>
+            dropdown active
+            <%} else { %>
+            dropdown
+            <% } %>">
+            <a class="ddbtn" href="#"><i class="fa fa-school"></i>View Payments</a>
+            <div class="dropdown-content">
+                <a href="/admin/getPayments">View Payments</a>
+            </div>
+        </li>
+
+        <!-- Manage Internships -->
+        <li class="<% if (page_name === 'internships') { %> dropdown active <% } else { %> dropdown <% } %>">
+            <a class="ddbtn" href="#"><i class="fa fa-briefcase"></i>Manage Internships</a>
+            <div class="dropdown-content">
+            <a href="/admin/addInternship">Add New Internship</a>
+            <a href="/admin/getInternships">Internship Settings</a>
+            </div>
+        </li>
+        
+        <!-- Manage Exams -->
+        <li class="<% if (page_name === 'exams') { %> dropdown active <% } else { %> dropdown <% } %>">
+            <a class="ddbtn" href="#"><i class="fa fa-pencil-alt"></i>Manage Exams</a>
+            <div class="dropdown-content">
+            <a href="/admin/addExam">Add New Exam</a>
+            <a href="/admin/getExams">Exam Settings</a>
+            </div>
+        </li>
+        
+        <!-- Manage Alumni -->
+        <li class="<% if (page_name === 'alumni') { %> dropdown active <% } else { %> dropdown <% } %>">
+            <a class="ddbtn" href="#"><i class="fa fa-graduation-cap"></i>Manage Alumni</a>
+            <div class="dropdown-content">
+            <a href="/admin/addAlumni">Add New Alumni</a>
+            <a href="/admin/getAlumni">Alumni Settings</a>
+            </div>
+        </li>
+        
+        <!-- Manage Parent Contact -->
+        <li class="<% if (page_name === 'parentContact') { %> dropdown active <% } else { %> dropdown <% } %>">
+            <a class="ddbtn" href="#"><i class="fa fa-user"></i>Manage Parent Contact</a>
+            <div class="dropdown-content">
+            <a href="/admin/addParentContact">Add New Parent Contact</a>
+            <a href="/admin/getParentContacts">Parent Contact Settings</a>
+            </div>
+        </li>
+  
 
 
 
