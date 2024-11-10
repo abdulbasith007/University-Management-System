@@ -9,7 +9,7 @@ const db = mysql.createConnection({
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
   dateStrings: 'date',
-  database: 'university_management_system',
+  database: 'cumsdbms',
 });
 
 // Students limit per section
@@ -53,7 +53,6 @@ exports.getOverview = async (req, res, next) => {
   const courses = await zeroParamPromise('SELECT * FROM course');
   const classes = await zeroParamPromise('SELECT * FROM class');
   res.render('Admin/overview', {
-    user,
     students,
     staffs,
     departments,
