@@ -9,7 +9,7 @@ const db = mysql.createConnection({
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
   dateStrings: 'date',
-  database: 'cumsdbms',
+  database: 'cumsdbms1',
 });
 
 // Students limit per section
@@ -47,17 +47,18 @@ exports.getDashboard = async (req, res, next) => {
 exports.getOverview = async (req, res, next) => {
 //   const sql = 'SELECT * FROM admin WHERE admin_id = ?';
 //   const user = (await queryParamPromise(sql, [req.user]))[0];
-  const students = await zeroParamPromise('SELECT * FROM student');
-  const staffs = await zeroParamPromise('SELECT * FROM staff');
-  const departments = await zeroParamPromise('SELECT * FROM department');
-  const courses = await zeroParamPromise('SELECT * FROM course');
-  const classes = await zeroParamPromise('SELECT * FROM class');
+  const students = await zeroParamPromise('SELECT * FROM students');
+  const staffs = await zeroParamPromise('SELECT * FROM faculty');
+  const departments = await zeroParamPromise('SELECT * FROM departments');
+  const courses = await zeroParamPromise('SELECT * FROM courses');
+//   const classes = await zeroParamPromise('SELECT * FROM class');
+//TODO: Add other tables
   res.render('Admin/overview', {
     students,
     staffs,
     departments,
     courses,
-    classes,
+    // classes,
     page_name: 'profile',
   });
 };
@@ -65,7 +66,7 @@ exports.getOverview = async (req, res, next) => {
 // 2. STAFFS
 // 2.1 Add staff
 exports.getAddStaff = async (req, res, next) => {
-  const sql = 'SELECT dept_id from department';
+  const sql = 'SELECT DepartmentID from departments';
   const results = await zeroParamPromise(sql);
   let departments = [];
   for (let i = 0; i < results.length; ++i) {
@@ -79,7 +80,7 @@ exports.getAddStaff = async (req, res, next) => {
 
 exports.postAddStaff = async (req, res, next) => {
   const { email } = req.body;
-  const sql1 = 'SELECT count(*) as `count` from staff where email = ?';
+  const sql1 = 'SELECT count(*) as `count` from faculty where email = ?'; //TODO: email is in person table
   const count = (await queryParamPromise(sql1, [email]))[0].count;
   if (count !== 0) {
     req.flash('error', 'Staff with that email already exists');
@@ -121,11 +122,11 @@ exports.postAddStaff = async (req, res, next) => {
 };
 // 2.2 Get staffs on query
 exports.getRelevantStaff = async (req, res, next) => {
-  const sql = 'SELECT dept_id from department';
+  const sql = 'SELECT DepartmentID from departments';
   const results = await zeroParamPromise(sql);
   let departments = [];
   for (let i = 0; i < results.length; ++i) {
-    departments.push(results[i].dept_id);
+    departments.push(results[i].DepartmentID);
   }
   res.render('Admin/Staff/selectStaff', {
     departments: departments,
@@ -134,55 +135,13 @@ exports.getRelevantStaff = async (req, res, next) => {
 };
 
 exports.postRelevantStaff = async (req, res, next) => {
-  const { section, department } = req.body;
-  if (department === 'None' && section !== '') {
+  const { department } = req.body;
+  if (department === 'None') {
     req.flash('error', 'Please select department for the given section');
     res.redirect('/admin/getStaff');
-  } else if (section !== '') {
-    const sql1 =
-      'select max(section) as `max_section` from student where dept_id = ?';
-    const max_section = (await queryParamPromise(sql1, [department]))[0]
-      .max_section;
-    if (max_section !== null && section <= max_section) {
-      // All teachers from given section and department
-      const sql2 = 'select c_id from course where dept_id = ?';
-      let course_ids = await queryParamPromise(sql2, [department]);
-      if (course_ids.length === 0) {
-        return res.render('Admin/Staff/getStaff', {
-          data: [],
-          page_name: 'staff',
-        });
-      }
-      const courses = [];
-      for (const course_id of course_ids) {
-        courses.push(course_id.c_id);
-      }
-      const sql3 = 'select st_id from class where section = ? and c_id in (?)';
-      const staff_ids = await queryParamPromise(sql3, [section, courses]);
-      if (staff_ids.length === 0) {
-        return res.render('Admin/Staff/getStaff', {
-          data: [],
-          page_name: 'staff',
-        });
-      }
-      const staffs = [];
-      for (const staff_id of staff_ids) {
-        staffs.push(staff_id.st_id);
-      }
-      const sql4 = 'select * from staff where st_id in (?)';
-      const results = await queryParamPromise(sql4, [staffs]);
-      return res.render('Admin/Staff/getStaff', {
-        data: results,
-        page_name: 'staff',
-      });
-    } else {
-      // section for the given department does not exist
-      req.flash('error', 'Section for the given department does not exist');
-      res.redirect('/admin/getStaff');
-    }
   } else if (department !== 'None') {
     // All teachers from particular department
-    const sql = 'select * from staff where dept_id = ?';
+    const sql = "select FacultyID, DepartmentID, CONCAT(FirstName, ' ', LastName) AS Name, Email, DateOfBirth from faculty NATURAL JOIN person where DepartmentID = ?";
     const results = await queryParamPromise(sql, [department]);
     return res.render('Admin/Staff/getStaff', {
       data: results,
@@ -195,7 +154,7 @@ exports.postRelevantStaff = async (req, res, next) => {
 
 // 2.3 Get all staffs
 exports.getAllStaff = async (req, res, next) => {
-  const sql = 'SELECT * FROM staff';
+  const sql = "select FacultyID, DepartmentID, CONCAT(FirstName, ' ', LastName) AS Name, Email, DateOfBirth from faculty NATURAL JOIN person";
   const results = await zeroParamPromise(sql);
   res.render('Admin/Staff/getStaff', { data: results, page_name: 'staff' });
 };
@@ -203,11 +162,11 @@ exports.getAllStaff = async (req, res, next) => {
 // 2.4 Modify existing staffs
 exports.getStaffSettings = async (req, res, next) => {
   const staffEmail = req.params.id;
-  const sql1 = 'SELECT * FROM staff WHERE email = ?';
+  const sql1 = 'SELECT * FROM faculty WHERE email = ?';
   const staffData = await queryParamPromise(sql1, [staffEmail]);
   const address = staffData[0].st_address.split('-');
   staffData[0].address = address;
-  const results = await zeroParamPromise('SELECT * from department');
+  const results = await zeroParamPromise('SELECT * from departments');
   let departments = [];
   for (let i = 0; i < results.length; ++i) {
     departments.push(results[i].dept_id);

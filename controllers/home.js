@@ -3,7 +3,7 @@ exports.getIndex = (req, res, next) => {
   };
   
   exports.getLanding = (req, res, next) => {
-    res.render('landing');
+    res.redirect('/admin/dashboard');
   }
   
   exports.getError404 = (req, res, next) => {
