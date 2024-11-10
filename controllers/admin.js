@@ -230,11 +230,11 @@ exports.postStaffSettings = async (req, res, next) => {
 // 3. STUDENTS
 // 3.1 Add student
 exports.getAddStudent = async (req, res, next) => {
-  const sql = 'SELECT * from department';
+  const sql = 'SELECT DepartmentID from departments';
   const results = await zeroParamPromise(sql);
   let departments = [];
   for (let i = 0; i < results.length; ++i) {
-    departments.push(results[i].dept_id);
+    departments.push(results[i].DepartmentID);
   }
   res.render('Admin/Student/addStudent', {
     page_name: 'students',
@@ -285,11 +285,11 @@ exports.postAddStudent = async (req, res, next) => {
 
 // 3.2 Get students on query
 exports.getRelevantStudent = async (req, res, next) => {
-  const sql = 'SELECT * from department';
+  const sql = 'SELECT DepartmentID from departments';
   const results = await zeroParamPromise(sql);
   let departments = [];
   for (let i = 0; i < results.length; ++i) {
-    departments.push(results[i].dept_id);
+    departments.push(results[i].DepartmentID);
   }
   res.render('Admin/Student/deptSelect', {
     departments: departments,
@@ -504,29 +504,35 @@ exports.postClassSettings = async (req, res, next) => {
 // 5. DEPARTMENTS
 // 5.1 Select department
 exports.getDept = async (req, res, next) => {
-  const results = await zeroParamPromise('SELECT * FROM department');
+  const results = await zeroParamPromise('SELECT * FROM departments');
   res.render('Admin/Department/getDept', {
     data: results,
     page_name: 'depts',
   });
 };
 
-// 5.2 Add department
+// Display form to add department
 exports.getAddDept = (req, res, next) => {
   res.render('Admin/Department/addDept', { page_name: 'depts' });
 };
 
+// Add a new department
 exports.postAddDept = async (req, res, next) => {
   const deptName = req.body.department;
-  const deptId = req.body.deptId;
-  const sql1 = 'SELECT * from department where dept_id = ? or d_name = ?';
-  const results = await queryParamPromise(sql1, [deptId, deptName]);
+  const buildingName = req.body.building;
+
+  const sql1 = 'SELECT * FROM departments WHERE DepartmentName = ?';
+  const results = await queryParamPromise(sql1, [deptName]);
+  
   if (results.length !== 0) {
-    req.flash('error', 'Department with that name or id already exists');
+    req.flash('error', 'Department with that name already exists');
     return res.redirect('/admin/addDept');
   } else {
-    const sql2 = 'INSERT INTO department SET ?';
-    await queryParamPromise(sql2, { dept_id: deptId, d_name: deptName });
+    const sql2 = 'INSERT INTO departments SET ?';
+    await queryParamPromise(sql2, {
+      DepartmentName: deptName,
+      Building_Name: buildingName,
+    });
     req.flash('success_msg', 'Department added successfully');
     res.redirect('/admin/getDept');
   }
@@ -535,7 +541,7 @@ exports.postAddDept = async (req, res, next) => {
 // 5.3 Modify existing department
 exports.getDeptSettings = async (req, res, next) => {
   const deptId = req.params.id;
-  const sql1 = 'SELECT * FROM department WHERE dept_id = ?';
+  const sql1 = 'SELECT * FROM departments WHERE dept_id = ?';
   const results = await queryParamPromise(sql1, [deptId]);
   res.render('Admin/Department/setDept', {
     name: results[0].d_name,

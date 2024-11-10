@@ -29,36 +29,33 @@
                                     </div>
                                     <div class="card-body">
                                         <%- include('../../Includes/messages') %>
-                                        <input class="form-control mb-4" id="searchInput" type="text"
-                                            placeholder="Search Department">
+                                        <input class="form-control mb-4" id="searchInput" type="text" placeholder="Search Department">
                                         <h6 class="heading-small text-muted mb-4">Department Information</h6>
                                         <div class="table-responsive">
-                                            <table class="table">
-                                                <thead class="thead-dark">
-                                                    <tr>
-                                                        <th scope="col">#</th>
-                                                        <th scope="col">Department ID</th>
-                                                        <th scope="col">Department Name</th>
-                                                        <th scope="col">Manage Dept</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="departmentTable">
-                                                    <% for(var i=0; i < data.length; i++) { %>
-                                                    <tr>
-                                                        <th scope="row"><%= i + 1 %></th>
-                                                        <td><%= data[i].dept_id %></td>
-                                                        <td><%= data[i].d_name %></td>
-                                                        <td><a href="/admin/settings/department/<%= data[i].dept_id %>"
-                                                                class="btn btn-sm btn-primary">Settings</a></td>
-                                                    </tr>
-                                                    <% } %>
-                                                </tbody>
-                                            </table>
+                                          <table class="table">
+                                            <thead class="thead-dark">
+                                              <tr>
+                                                <th scope="col">Department ID</th>
+                                                <th scope="col">Department Name</th>
+                                                <th scope="col">Building Name</th>
+                                                <th scope="col">Manage Dept</th>
+                                              </tr>
+                                            </thead>
+                                            <tbody id="departmentTable">
+                                              <% for (var i = 0; i < data.length; i++) { %>
+                                                <tr>
+                                                  <td><%= data[i].DepartmentID %></td>
+                                                  <td><%= data[i].DepartmentName %></td>
+                                                  <td><%= data[i].Building_Name %></td>
+                                                  <td>
+                                                    <a href="/admin/settings/department/<%= data[i].DepartmentID %>" class="btn btn-sm btn-primary">Settings</a>
+                                                  </td>
+                                                </tr>
+                                              <% } %>
+                                            </tbody>
+                                          </table>
                                         </div>
-                                        </form>
-
-
-                                    </div>
+                                      </div>
                                 </div>
                             </div>
 
