@@ -774,3 +774,335 @@ exports.postRelevantClub = async (req, res, next) => {
     });
   }
 };
+
+// 8.1 Add Scholarship
+exports.getAddScholarship = async (req, res, next) => {
+  const sql = 'SELECT FacultyID, CONCAT(FirstName, " ", LastName) AS Name FROM faculty NATURAL JOIN person';
+  const results = await zeroParamPromise(sql);
+
+  res.render('Admin/Scholarship/addScholarship', {
+    facultyAdvisors: results,  // Send faculty data to the view
+    page_name: 'scholarships',
+  });
+};
+
+exports.postAddScholarship = async (req, res, next) => {
+  const { scholarshipAmount, eligibilityCriteria, facultyAdvisorID } = req.body;
+
+  const sql1 = 'SELECT count(*) as `count` FROM scholarships WHERE Amount = ? AND EligibilityCriteria = ?';
+  const count = (await queryParamPromise(sql1, [scholarshipAmount, eligibilityCriteria]))[0].count;
+
+  if (count !== 0) {
+    req.flash('error', 'A scholarship with the same amount and criteria already exists');
+    res.redirect('/admin/addScholarship');
+  } else {
+    const scholarshipData = {
+      Amount: scholarshipAmount,
+      EligibilityCriteria: eligibilityCriteria,
+    };
+
+    try {
+      const sql2 = 'INSERT INTO scholarships SET ?';
+      await queryParamPromise(sql2, scholarshipData);
+
+      req.flash('success_msg', 'Scholarship added successfully');
+      res.redirect('/admin/getScholarships');
+    } catch (error) {
+      console.error("Error adding scholarship:", error);
+      req.flash('error', 'Failed to add scholarship');
+      res.redirect('/admin/addScholarship');
+    }
+  }
+};
+
+// 8.2 Get All Scholarships
+exports.getAllScholarships = async (req, res, next) => {
+  const sql = `SELECT ScholarshipID, Amount, EligibilityCriteria FROM scholarships`;
+  const results = await zeroParamPromise(sql);
+  res.render('Admin/Scholarship/getScholarships', { data: results, page_name: 'scholarships' });
+};
+
+// 8.3 Modify Scholarship
+exports.getScholarshipSettings = async (req, res, next) => {
+  const scholarshipID = req.params.id;
+  const sql1 = 'SELECT * FROM scholarships WHERE ScholarshipID = ?';
+  const scholarshipData = await queryParamPromise(sql1, [scholarshipID]);
+
+  // const results = await zeroParamPromise('SELECT FacultyAdvisorID FROM faculty');
+  // let facultyAdvisors = [];
+  // for (let i = 0; i < results.length; ++i) {
+  //     facultyAdvisors.push(results[i].FacultyAdvisorID);
+  // }
+
+  res.render('Admin/Scholarship/setScholarship', {
+    scholarshipData: scholarshipData[0],
+    // facultyAdvisors: facultyAdvisors,
+    page_name: 'Scholarship Settings',
+  });
+};
+
+exports.postScholarshipSettings = async (req, res, next) => {
+  const { scholarshipID, scholarshipAmount, eligibilityCriteria, facultyAdvisorID } = req.body;
+
+  const sql = 'UPDATE scholarships SET Amount = ?, EligibilityCriteria = ?, FacultyAdvisorID = ? WHERE ScholarshipID = ?';
+  await queryParamPromise(sql, [scholarshipAmount, eligibilityCriteria, facultyAdvisorID, scholarshipID]);
+
+  req.flash('success_msg', 'Scholarship updated successfully');
+  res.redirect('/admin/getScholarships');
+};
+
+// 1.2 Get relevant scholarships based on query
+exports.getRelevantScholarship = async (req, res, next) => {
+  const { facultyAdvisorID } = req.query;
+
+  let sql = 'SELECT ScholarshipID, Amount, EligibilityCriteria FROM scholarships';
+  let params = [];
+
+  const results = await queryParamPromise(sql, params);
+  res.render('Admin/Scholarship/getScholarships', { data: results, page_name: 'scholarships' });
+};
+
+// 1.3 Post relevant scholarships based on query
+exports.postRelevantScholarship = async (req, res, next) => {
+  const { facultyAdvisorID } = req.body;
+
+  // if (facultyAdvisorID === 'None') {
+  //   req.flash('error', 'Please select a faculty advisor');
+  //   res.redirect('/admin/getScholarships');
+  // } else {
+    // const sql = 'SELECT ScholarshipID, ScholarshipName, Description, Amount FROM scholarships WHERE FacultyAdvisorID = ?';
+    // const results = await queryParamPromise(sql, [facultyAdvisorID]);
+
+    // res.render('Admin/Scholarship/getScholarships', {
+    //   data: results,
+    //   page_name: 'scholarships',
+    // });
+  // }
+};
+
+
+// 9.1 Add Internship
+exports.getAddInternship = async (req, res, next) => {
+  const sql = 'SELECT FacultyID, CONCAT(FirstName, " ", LastName) AS Name FROM faculty NATURAL JOIN person';
+  const results = await zeroParamPromise(sql);
+
+  res.render('Admin/Internship/addInternship', {
+    facultyAdvisors: results,  // Send faculty data to the view
+    page_name: 'internships',
+  });
+};
+
+exports.postAddInternship = async (req, res, next) => {
+  const { companyName } = req.body;
+
+  const internshipData = {
+    CompanyName: companyName,
+    // Duration: duration,
+    // Stipend: stipend
+  };
+
+  try {
+    const sql2 = 'INSERT INTO internships SET ?';
+    await queryParamPromise(sql2, internshipData);
+
+    req.flash('success_msg', 'Internship added successfully');
+    res.redirect('/admin/getInternships');
+  } catch (error) {
+    console.error("Error adding internship:", error);
+    req.flash('error', 'Failed to add internship');
+    res.redirect('/admin/addInternship');
+  }
+};
+
+// 9.2 Get All Internships
+exports.getAllInternships = async (req, res, next) => {
+  const sql = `SELECT InternshipID, CompanyName FROM internships`;
+  const results = await zeroParamPromise(sql);
+  res.render('Admin/Internship/getInternships', { data: results, page_name: 'internships' });
+};
+
+// 9.3 Modify Internship
+exports.getInternshipSettings = async (req, res, next) => {
+  const internshipID = req.params.id;
+  const sql1 = 'SELECT * FROM internships WHERE InternshipID = ?';
+  const internshipData = await queryParamPromise(sql1, [internshipID]);
+
+  const results = await zeroParamPromise('SELECT FacultyAdvisorID FROM faculty');
+  let facultyAdvisors = [];
+  for (let i = 0; i < results.length; ++i) {
+    facultyAdvisors.push(results[i].FacultyAdvisorID);
+  }
+
+  res.render('Admin/Internship/setInternship', {
+    internshipData: internshipData[0],
+    facultyAdvisors: facultyAdvisors,
+    page_name: 'Internship Settings',
+  });
+};
+
+exports.postInternshipSettings = async (req, res, next) => {
+  const { internshipID, companyName, duration, stipend, facultyAdvisorID } = req.body;
+
+  const sql = 'UPDATE internships SET CompanyName = ?, Duration = ?, Stipend = ?, FacultyAdvisorID = ? WHERE InternshipID = ?';
+  await queryParamPromise(sql, [companyName, duration, stipend, facultyAdvisorID, internshipID]);
+
+  req.flash('success_msg', 'Internship updated successfully');
+  res.redirect('/admin/getInternships');
+};
+
+// 1.2 Get relevant internships based on query
+exports.getRelevantInternship = async (req, res, next) => {
+  const { facultyAdvisorID } = req.query;
+
+  let sql = 'SELECT InternshipID, CompanyName FROM internships';
+  let params = [];
+
+  // // If a facultyAdvisorID is provided, filter by it
+  // if (facultyAdvisorID) {
+  //   sql += ' WHERE FacultyAdvisorID = ?';
+  //   params.push(facultyAdvisorID);
+  // }
+
+  const results = await queryParamPromise(sql, params);
+  res.render('Admin/Internship/getInternships', { data: results, page_name: 'internships' });
+};
+
+// 1.3 Post relevant internships based on query
+exports.postRelevantInternship = async (req, res, next) => {
+  // const { facultyAdvisorID } = req.body;
+
+  // if (facultyAdvisorID === 'None') {
+  //   req.flash('error', 'Please select a faculty advisor');
+  //   res.redirect('/admin/getInternships');
+  // } else {
+    const sql = 'SELECT InternshipID, CompanyName FROM internships';
+    const results = await queryParamPromise(sql);
+
+    res.render('Admin/Internship/getInternships', {
+      data: results,
+      page_name: 'internships',
+    });
+  // }
+};
+
+// Fetch department names for alumni addition form
+exports.getAddAlumni = async (req, res, next) => {
+  const sql = 'SELECT DepartmentID, DepartmentName FROM departments';
+  const departments = await zeroParamPromise(sql);
+  res.render('Admin/Alumni/addAlumni', {
+      departments: departments,
+      page_name: 'alumni',
+  });
+};
+
+// Insert new alumni data
+exports.postAddAlumni = async (req, res, next) => {
+  const { graduationDate, currentJobTitle, currentEmployer, name, email, department } = req.body;
+
+  const alumniData = {
+      GraduationDate: graduationDate,
+      CurrentJobTitle: currentJobTitle,
+      CurrentEmployer: currentEmployer,
+      Name: name,
+      Email: email,
+      DepartmentID: department,
+  };
+
+  try {
+      const sql = 'INSERT INTO alumni SET ?';
+      await queryParamPromise(sql, alumniData);
+      req.flash('success_msg', 'Alumni added successfully');
+      res.redirect('/admin/getAllAlumni');
+  } catch (error) {
+      console.error("Error adding alumni:", error);
+      req.flash('error', 'Failed to add alumni');
+      res.redirect('/admin/addAlumni');
+  }
+};
+
+// Retrieve department names for alumni filtering form
+exports.getRelevantAlumni = async (req, res, next) => {
+  const sql = 'SELECT DepartmentID, DepartmentName FROM departments';
+  const departments = await zeroParamPromise(sql);
+  res.render('Admin/Alumni/selectAlumni', {
+      departments: departments,
+      page_name: 'alumni',
+  });
+};
+
+// Retrieve alumni list for selected department
+exports.postRelevantAlumni = async (req, res, next) => {
+  const { department } = req.body;
+
+  if (!department || department === 'None') {
+      req.flash('error', 'Please select a department.');
+      res.redirect('/admin/getAlumni');
+  } else {
+      const sql = `
+          SELECT AlumniID, GraduationDate, CurrentJobTitle, CurrentEmployer, Name, Email, DepartmentName
+          FROM alumni
+          INNER JOIN departments ON alumni.DepartmentID = departments.DepartmentID
+          WHERE alumni.DepartmentID = ?`;
+      const alumniList = await queryParamPromise(sql, [department]);
+
+      res.render('Admin/Alumni/getAlumni', {
+          data: alumniList,
+          page_name: 'alumni',
+      });
+  }
+};
+
+// Retrieve all alumni
+exports.getAllAlumni = async (req, res, next) => {
+  const sql = `
+      SELECT AlumniID, GraduationDate, CurrentJobTitle, CurrentEmployer, Name, Email, DepartmentName
+      FROM alumni
+      INNER JOIN departments ON alumni.DepartmentID = departments.DepartmentID`;
+  const alumniList = await zeroParamPromise(sql);
+
+  res.render('Admin/Alumni/getAlumni', {
+      data: alumniList,
+      page_name: 'alumni',
+  });
+};
+
+exports.getAlumniSettings = async (req, res, next) => {
+  const alumniID = req.params.id;
+
+  // Fetch alumni data by ID
+  const sql1 = `
+    SELECT AlumniID, GraduationDate, CurrentJobTitle, CurrentEmployer, Name, Email, DepartmentID 
+    FROM Alumni 
+    WHERE AlumniID = ?`;
+  const alumniData = await queryParamPromise(sql1, [alumniID]);
+
+  // Fetch list of departments for selection
+  const departmentResults = await zeroParamPromise('SELECT DepartmentID, DepartmentName FROM Departments');
+  const departments = departmentResults.map(dept => ({
+    DepartmentID: dept.DepartmentID,
+    DepartmentName: dept.DepartmentName
+  }));
+
+  // Render alumni settings view with retrieved data
+  res.render('Admin/Alumni/setAlumni', {
+    alumniData: alumniData[0],
+    departments: departments,
+    page_name: 'Alumni Settings'
+  });
+};
+
+// Controller function to post/update alumni settings
+exports.postAlumniSettings = async (req, res, next) => {
+  const { alumniID, graduationDate, currentJobTitle, currentEmployer, name, email, departmentID } = req.body;
+
+  // SQL query to update alumni information
+  const sql = `
+    UPDATE Alumni 
+    SET GraduationDate = ?, CurrentJobTitle = ?, CurrentEmployer = ?, Name = ?, Email = ?, DepartmentID = ? 
+    WHERE AlumniID = ?`;
+  await queryParamPromise(sql, [graduationDate, currentJobTitle, currentEmployer, name, email, departmentID, alumniID]);
+
+  // Show success message and redirect back to alumni list or relevant page
+  req.flash('success_msg', 'Alumni settings updated successfully');
+  res.redirect('/admin/getAlumni');
+};

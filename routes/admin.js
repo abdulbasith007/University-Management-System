@@ -83,31 +83,31 @@ router.post('/addClub', controller.postAddClub);
 router.get('/settings/club/:id', controller.getClubSettings);
 router.post('/settings/club', controller.postClubSettings);
 
-// // 8.SCHOLARSHIPS
-// // 8.1 Get all scholarships
-// router.get('/getAllScholarships', controller.getAllScholarships);
-// // 8.2 Get scholarships on query
-// router.get('/getScholarship', controller.getRelevantScholarship);
-// router.post('/getScholarship', controller.postRelevantScholarship);
-// // 8.3 Add scholarship
-// router.get('/addScholarship', controller.getAddScholarship);
-// router.post('/addScholarship', controller.postAddScholarship);
-// // 8.4 Modify existing scholarships
-// router.get('/settings/scholarship/:id', controller.getScholarshipSettings);
-// router.post('/settings/scholarship', controller.postScholarshipSettings);
+// 8.SCHOLARSHIPS
+// 8.1 Get all scholarships
+router.get('/getAllScholarships', controller.getAllScholarships);
+// 8.2 Get scholarships on query
+router.get('/getScholarships', controller.getRelevantScholarship);
+router.post('/getScholarships', controller.postRelevantScholarship);
+// 8.3 Add scholarship
+router.get('/addScholarship', controller.getAddScholarship);
+router.post('/addScholarship', controller.postAddScholarship);
+// 8.4 Modify existing scholarships
+router.get('/settings/scholarship/:id', controller.getScholarshipSettings);
+router.post('/settings/scholarship', controller.postScholarshipSettings);
 
-// // 9.INTERNSHIPS
-// // 9.1 Get all internships
-// router.get('/getAllInternships', controller.getAllInternships);
-// // 9.2 Get internships on query
-// router.get('/getInternship', controller.getRelevantInternship);
-// router.post('/getInternship', controller.postRelevantInternship);
-// // 9.3 Add internship
-// router.get('/addInternship', controller.getAddInternship);
-// router.post('/addInternship', controller.postAddInternship);
-// // 9.4 Modify existing internships
-// router.get('/settings/internship/:id', controller.getInternshipSettings);
-// router.post('/settings/internship', controller.postInternshipSettings);
+// 9.INTERNSHIPS
+// 9.1 Get all internships
+router.get('/getAllInternships', controller.getAllInternships);
+// 9.2 Get internships on query
+router.get('/getInternships', controller.getRelevantInternship);
+router.post('/getInternships', controller.postRelevantInternship);
+// 9.3 Add internship
+router.get('/addInternship', controller.getAddInternship);
+router.post('/addInternship', controller.postAddInternship);
+// 9.4 Modify existing internships
+router.get('/settings/internship/:id', controller.getInternshipSettings);
+router.post('/settings/internship', controller.postInternshipSettings);
 
 // // 10.PAYMENTS
 // // 10.1 Get all payments
@@ -135,18 +135,18 @@ router.post('/settings/club', controller.postClubSettings);
 // router.get('/settings/exam/:id', controller.getExamSettings);
 // router.post('/settings/exam', controller.postExamSettings);
 
-// // 12.ALUMNI
-// // 12.1 Get all alumni
-// router.get('/getAllAlumni', controller.getAllAlumni);
-// // 12.2 Get alumni on query
-// router.get('/getAlumni', controller.getRelevantAlumni);
-// router.post('/getAlumni', controller.postRelevantAlumni);
-// // 12.3 Add alumni
-// router.get('/addAlumni', controller.getAddAlumni);
-// router.post('/addAlumni', controller.postAddAlumni);
-// // 12.4 Modify existing alumni
-// router.get('/settings/alumni/:id', controller.getAlumniSettings);
-// router.post('/settings/alumni', controller.postAlumniSettings);
+// 12.ALUMNI
+// 12.1 Get all alumni
+router.get('/getAllAlumni', controller.getAllAlumni);
+// 12.2 Get alumni on query
+router.get('/getAlumni', controller.getRelevantAlumni);
+router.post('/getAlumni', controller.postRelevantAlumni);
+// 12.3 Add alumni
+router.get('/addAlumni', controller.getAddAlumni);
+router.post('/addAlumni', controller.postAddAlumni);
+// 12.4 Modify existing alumni
+router.get('/settings/alumni/:id', controller.getAlumniSettings);
+router.post('/settings/alumni', controller.postAlumniSettings);
 
 // // 13.PARENTS
 // // 13.1 Get all parents
