@@ -126,6 +126,8 @@ router.post('/settings/internship', controller.postInternshipSettings);
 // 11.1 Get all exams
 router.get('/getAllExams', controller.getExams);
 // 11.2 Get exams on query
+router.get('/getRelevantExams', controller.getRelevantExams);
+router.post('/getRelevantExams', controller.postRelevantExams);
 router.get('/getExams', controller.getRelevantExams);
 router.post('/getExams', controller.postRelevantExams);
 // 11.3 Add exam
@@ -154,6 +156,8 @@ router.get('/getAllParents', controller.getAllParents);
 // 13.2 Get parents on query
 router.get('/getParentContacts', controller.getRelevantParent);
 router.post('/getParentContacts', controller.postRelevantParent);
+router.get('/getRelevantParent', controller.getRelevantParent);
+router.post('/getRelevantParent', controller.postRelevantParent);
 // 13.3 Add parent
 router.get('/addParentContact', controller.getAddParentContact);
 router.post('/addParentContact', controller.postAddParentContact);

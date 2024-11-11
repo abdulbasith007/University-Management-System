@@ -1192,14 +1192,14 @@ exports.getRelevantExams = async (req, res, next) => {
 
 // 2.2 Post Exams by Course
 exports.postRelevantExams = async (req, res, next) => {
-  const { courseID } = req.body;
+  const { course: courseID } = req.body;
   if (courseID === 'None') {
     req.flash('error', 'Please select a course');
-    res.redirect('/admin/getExam');
+    res.redirect('/admin/getExams');
   } else {
-    const sql = "SELECT ExamID, CourseID, ExamDate, TotalMarks FROM exams WHERE CourseID = ?";
+    const sql = "SELECT ExamID, exams.CourseID as CourseID, CourseName, ExamDate, TotalMarks FROM exams JOIN courses ON exams.CourseID = courses.CourseID WHERE exams.CourseID = ?";
     const results = await queryParamPromise(sql, [courseID]);
-    res.render('Admin/Exam/getExam', {
+    res.render('Admin/Exam/getExams', {
       data: results,
       page_name: 'exam',
     });
