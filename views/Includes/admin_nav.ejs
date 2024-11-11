@@ -53,7 +53,7 @@
             </div>
         </li>
 
-        <li class="<% if (page_name === 'classes') { %>
+        <!-- <li class="<% if (page_name === 'classes') { %>
             dropdown active
             <%} else { %>
             dropdown
@@ -63,7 +63,7 @@
                 <a href="/admin/addClass">Add New Class</a>
                 <a href="/admin/getClass">Class Settings</a>
             </div>
-        </li>
+        </li> -->
 
         <li class="<% if (page_name === 'clubs') { %>
             dropdown active
@@ -82,7 +82,7 @@
             <%} else { %>
             dropdown
             <% } %>">
-            <a class="ddbtn" href="#"><i class="fa fa-school"></i>Manage Scholarships</a>
+            <a class="ddbtn" href="#"><i class="fa fa-chalkboard"></i>Scholarships</a>
             <div class="dropdown-content">
                 <a href="/admin/addScholarship">Add New scholarship</a>
                 <a href="/admin/getScholarships">Scholarship Settings</a>
@@ -102,7 +102,7 @@
 
         <!-- Manage Internships -->
         <li class="<% if (page_name === 'internships') { %> dropdown active <% } else { %> dropdown <% } %>">
-            <a class="ddbtn" href="#"><i class="fa fa-briefcase"></i>Manage Internships</a>
+            <a class="ddbtn" href="#"><i class="fa fa-briefcase"></i>Internships</a>
             <div class="dropdown-content">
             <a href="/admin/addInternship">Add New Internship</a>
             <a href="/admin/getInternships">Internship Settings</a>
@@ -129,10 +129,10 @@
         
         <!-- Manage Parent Contact -->
         <li class="<% if (page_name === 'parentContact') { %> dropdown active <% } else { %> dropdown <% } %>">
-            <a class="ddbtn" href="#"><i class="fa fa-user"></i>Manage Parent Contact</a>
+            <a class="ddbtn" href="#"><i class="fa fa-user"></i>Parent Contact</a>
             <div class="dropdown-content">
-            <a href="/admin/addParentContact">Add New Parent Contact</a>
-            <a href="/admin/getParentContacts">Parent Contact Settings</a>
+            <a href="/admin/addParentContact">Add Contact</a>
+            <a href="/admin/getParentContacts">Contact Settings</a>
             </div>
         </li>
   
