@@ -954,7 +954,10 @@ exports.postInternshipSettings = async (req, res, next) => {
 exports.getRelevantInternship = async (req, res, next) => {
   const { facultyAdvisorID } = req.query;
 
-  let sql = 'SELECT InternshipID, CompanyName FROM internships';
+  let sql = `SELECT internships.InternshipID, concat (FirstName,' ',LastName) as StudentName, internships.CompanyName, Duration, Stipend
+FROM internships inner join student_internship_mapping on internships.InternshipID = student_internship_mapping.InternshipID
+inner join students on students.StudentID = student_internship_mapping.StudentID
+inner join Person on Person.PersonID = students.PersonID`;
   let params = [];
 
   // // If a facultyAdvisorID is provided, filter by it
