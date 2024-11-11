@@ -66,7 +66,7 @@ const insertMockData = async () => {
       { EnrollmentDate: '2023-01-15', PersonID: 2 },
       { EnrollmentDate: '2021-06-20', PersonID: 3 },
       { EnrollmentDate: '2023-09-10', PersonID: 4 },
-      { EnrollmentDate: '2020-03-05', PersonID: 5 },
+      { EnrollmentDate: '2020-03-05', PersonID: 5 }
     ];
     for (const student of students) {
       await queryParamPromise(
@@ -137,16 +137,16 @@ const insertMockData = async () => {
 
     // Clubs
     const clubs = [
-      { ClubName: 'Robotics Club', FacultyAdvisorID: 1 },
-      { ClubName: 'Drama Club', FacultyAdvisorID: 2 },
-      { ClubName: 'Music Club', FacultyAdvisorID: 3 },
-      { ClubName: 'Science Club', FacultyAdvisorID: 4 },
-      { ClubName: 'Literary Club', FacultyAdvisorID: 5 },
+      { ClubName: 'Robotics Club', Description: 'Meet with Human-Robo' ,FacultyAdvisorID: 1 },
+      { ClubName: 'Drama Club', Description: 'Show your REEL face', FacultyAdvisorID: 2 },
+      { ClubName: 'Music Club', Description: 'Describe the nature with your words', FacultyAdvisorID: 3 },
+      { ClubName: 'Science Club', Description: 'Understand the God', FacultyAdvisorID: 4 },
+      { ClubName: 'Literary Club', Description: 'Language is never barrier', FacultyAdvisorID: 5 },
     ];
     for (const club of clubs) {
       await queryParamPromise(
-        'INSERT INTO Clubs (ClubName, FacultyAdvisorID) VALUES (?, ?)',
-        [club.ClubName, club.FacultyAdvisorID]
+        'INSERT INTO Clubs (ClubName, Description, FacultyAdvisorID) VALUES (?, ?, ?)',
+        [club.ClubName, club.Description, club.FacultyAdvisorID]
       );
     }
 
@@ -167,31 +167,31 @@ const insertMockData = async () => {
 
     // Alumni
     const alumni = [
-      { GraduationDate: '2022-09-01', DepartmentID: 1 },
-      { GraduationDate: '2023-09-01', DepartmentID: 2 },
-      { GraduationDate: '2024-09-01', DepartmentID: 3 },
-      { GraduationDate: '2023-12-01', DepartmentID: 4 },
-      { GraduationDate: '2022-09-01', DepartmentID: 5 },
+      { GraduationDate: '2022-09-01', DepartmentID: 1, CurrentJobTitle: 'Senior Software Engineer', CurrentEmployer: 'Apple', Name: 'Shreya Tiwari', Email:'Stiwari@apple.com' },
+      { GraduationDate: '2023-09-01', DepartmentID: 2, CurrentJobTitle: 'Software Engineer', CurrentEmployer: 'Amazon', Name: 'Jasnoor', Email:'Jasnoor68@amazon.com' },
+      { GraduationDate: '2024-09-01', DepartmentID: 3, CurrentJobTitle: 'Gen AI developer', CurrentEmployer: 'Reliance', Name: 'Radhika Ambani', Email:'radhik@rel.com' },
+      { GraduationDate: '2023-12-01', DepartmentID: 4, CurrentJobTitle: 'CEO', CurrentEmployer: 'X', Name: 'Fi Jen', Email:'fiX@twitter.com' },
+      { GraduationDate: '2022-09-01', DepartmentID: 5, CurrentJobTitle: 'VP', CurrentEmployer: 'Wells Fargo', Name: 'Arush Gupta', Email:'agupta@wells.fargo.com' },
     ];
     for (const alum of alumni) {
       await queryParamPromise(
-        'INSERT INTO Alumni (GraduationDate, DepartmentID) VALUES (?, ?)',
-        [alum.GraduationDate, alum.DepartmentID]
+        'INSERT INTO Alumni (GraduationDate, DepartmentID, CurrentJobTitle, CurrentEmployer, Name, Email) VALUES (?, ?, ?, ?, ?, ?)',
+        [alum.GraduationDate, alum.DepartmentID, alum.CurrentJobTitle, alum.CurrentEmployer, alum.Name, alum.Email]
       );
     }
 
     // Parent Contact
     const parents = [
-      { ParentName: 'John Smith', PhoneNumber: '123-456-7890', StudentID: 1 },
-      { ParentName: 'Mary Johnson', PhoneNumber: '234-567-8901', StudentID: 2 },
-      { ParentName: 'Richard Williams', PhoneNumber: '345-678-9012', StudentID: 3 },
-      { ParentName: 'Linda Jones', PhoneNumber: '456-789-0123', StudentID: 4 },
-      { ParentName: 'Karen Brown', PhoneNumber: '567-890-1234', StudentID: 5 },
+      { ParentName: 'John Smith', PhoneNumber: '123-456-7890', StudentID: 1, Relationship: 'Father' },
+      { ParentName: 'Mary Johnson', PhoneNumber: '234-567-8901', StudentID: 2, Relationship: 'Sister' },
+      { ParentName: 'Richard Williams', PhoneNumber: '345-678-9012', StudentID: 3, Relationship: 'Father' },
+      { ParentName: 'Linda Jones', PhoneNumber: '456-789-0123', StudentID: 4, Relationship: 'Mother' },
+      { ParentName: 'Karen Brown', PhoneNumber: '567-890-1234', StudentID: 5, Relationship: 'Father' },
     ];
     for (const parent of parents) {
       await queryParamPromise(
-        'INSERT INTO Parent_Contact (ParentName, PhoneNumber, StudentID) VALUES (?, ?, ?)',
-        [parent.ParentName, parent.PhoneNumber, parent.StudentID]
+        'INSERT INTO Parent_Contact (ParentName, PhoneNumber, StudentID, Relationship) VALUES (?, ?, ?, ?)',
+        [parent.ParentName, parent.PhoneNumber, parent.StudentID, parent.Relationship]
       );
     }
 
@@ -257,31 +257,31 @@ const insertMockData = async () => {
 
     // Student-Course Mapping
     const studentCourseMapping = [
-      { StudentID: 1, CourseID: 1 },
-      { StudentID: 2, CourseID: 2 },
-      { StudentID: 3, CourseID: 3 },
-      { StudentID: 4, CourseID: 4 },
-      { StudentID: 5, CourseID: 5 },
+      { StudentID: 1, CourseID: 1, Marks: 80 },
+      { StudentID: 2, CourseID: 2, Marks: 65 },
+      { StudentID: 3, CourseID: 3, Marks: 35 },
+      { StudentID: 4, CourseID: 4, Marks: 96 },
+      { StudentID: 5, CourseID: 5, Marks: 72 },
     ];
     for (const mapping of studentCourseMapping) {
       await queryParamPromise(
-        'INSERT INTO Student_Course_Mapping (StudentID, CourseID) VALUES (?, ?)',
-        [mapping.StudentID, mapping.CourseID]
+        'INSERT INTO Student_Course_Mapping (StudentID, CourseID, Marks) VALUES (?, ?, ?)',
+        [mapping.StudentID, mapping.CourseID, mapping.Marks]
       );
     }
 
     // Student-Internship Mapping
     const studentInternshipMapping = [
-      { StudentID: 1, InternshipID: 1 },
-      { StudentID: 2, InternshipID: 2 },
-      { StudentID: 3, InternshipID: 3 },
-      { StudentID: 4, InternshipID: 4 },
-      { StudentID: 5, InternshipID: 5 },
+      { StudentID: 1, InternshipID: 1, Duration: 6 , Stipend: 10085.94  },
+      { StudentID: 2, InternshipID: 2, Duration: 3 , Stipend: 170085.64 },
+      { StudentID: 3, InternshipID: 3, Duration: 16 , Stipend: 3000085 },
+      { StudentID: 4, InternshipID: 4, Duration: 2 , Stipend: 8500.94 },
+      { StudentID: 5, InternshipID: 5, Duration: 8 , Stipend: 30000.00 },
     ];
     for (const mapping of studentInternshipMapping) {
       await queryParamPromise(
-        'INSERT INTO Student_Internship_Mapping (StudentID, InternshipID) VALUES (?, ?)',
-        [mapping.StudentID, mapping.InternshipID]
+        'INSERT INTO Student_Internship_Mapping (StudentID, InternshipID, Duration, Stipend) VALUES (?, ?, ?, ?)',
+        [mapping.StudentID, mapping.InternshipID, mapping.Duration, mapping.Stipend]
       );
     }
 
