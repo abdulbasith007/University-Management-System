@@ -881,17 +881,17 @@ exports.postRelevantScholarship = async (req, res, next) => {
 
 // 9.1 Add Internship
 exports.getAddInternship = async (req, res, next) => {
-  const sql = 'SELECT FacultyID, CONCAT(FirstName, " ", LastName) AS Name FROM faculty NATURAL JOIN person';
+  const sql = 'SELECT StudentID, CONCAT(FirstName, " ", LastName) AS Name FROM students NATURAL JOIN person';
   const results = await zeroParamPromise(sql);
 
   res.render('Admin/Internship/addInternship', {
-    facultyAdvisors: results,  // Send faculty data to the view
+    students: results,  // Send student data to the view
     page_name: 'internships',
   });
 };
 
 exports.postAddInternship = async (req, res, next) => {
-  const { companyName } = req.body;
+  const { companyName, duration, stipend, StudentID } = req.body;
 
   const internshipData = {
     CompanyName: companyName,
@@ -899,9 +899,23 @@ exports.postAddInternship = async (req, res, next) => {
     // Stipend: stipend
   };
 
+  
   try {
-    const sql2 = 'INSERT INTO internships SET ?';
-    await queryParamPromise(sql2, internshipData);
+    const sql = 'INSERT INTO internships SET ?';
+    const result = await queryParamPromise(sql, internshipData);
+    const internshipID = result.insertId;
+    
+    const StudentInternshipData = {
+      Duration: duration,
+      Stipend: stipend,
+      StudentID,
+      InternshipID: internshipID
+      // Duration: duration,
+      // Stipend: stipend
+    };
+
+    const sql1 = 'INSERT INTO student_internship_mapping SET ?';
+    await queryParamPromise(sql1, StudentInternshipData);
 
     req.flash('success_msg', 'Internship added successfully');
     res.redirect('/admin/getInternships');

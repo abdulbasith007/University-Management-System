@@ -23,7 +23,7 @@
                                     <div class="card-header bg-white border-0">
                                         <div class="row align-items-center">
                                             <div class="col-8">
-                                                <h3 class="mb-0" style="color: brown;">ADD NEW CLUBS</h3>
+                                                <h3 class="mb-0" style="color: brown;">ADD NEW INTERNSHIP</h3>
                                             </div>
                                         </div>
                                     </div>
@@ -52,17 +52,15 @@
                                               </div>
                                             </div>
                                           </div>
-                                          <div class="row">
                                             <div class="col-lg-6">
                                               <div class="form-group">
-                                                <label class="form-control-label" for="facultyAdvisorID">Faculty Advisor</label>
-                                                <select class="form-control" id="facultyAdvisorID" name="facultyAdvisorID" required>
-                                                  <% for(const advisor of facultyAdvisors) { %>
-                                                    <option value="<%= advisor.FacultyID %>"><%= advisor.Name %></option>
+                                                <label class="form-control-label" for="StudentID">Student Name</label>
+                                                <select class="form-control" id="StudentID" name="StudentID" required>
+                                                  <% for(const s of students) { %>
+                                                    <option value="<%= s.StudentID %>"><%= s.Name %></option>
                                                   <% } %>
                                                 </select>
                                               </div>
-                                            </div>
                                           </div>
                                         </div>
                                         <button type="submit" class="btn btn-primary btn-block">ADD INTERNSHIP</button>
