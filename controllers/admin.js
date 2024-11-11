@@ -1106,3 +1106,228 @@ exports.postAlumniSettings = async (req, res, next) => {
   req.flash('success_msg', 'Alumni settings updated successfully');
   res.redirect('/admin/getAlumni');
 };
+
+// 1. EXAMS
+
+// 1.1 Add Exam
+exports.getAddExam = async (req, res, next) => {
+  const sql = 'SELECT CourseID, CourseName FROM courses';
+  const results = await zeroParamPromise(sql);
+  let courses = [];
+  for (let i = 0; i < results.length; ++i) {
+    courses.push({ CourseID: results[i].CourseID, CourseName: results[i].CourseName });
+  }
+  res.render('Admin/Exam/addExam', {
+    courses: courses,
+    page_name: 'exam',
+  });
+};
+
+// 1.2 Post Add Exam
+exports.postAddExam = async (req, res, next) => {
+  const { courseID, examDate, totalMarks } = req.body;
+  const sql1 = 'SELECT count(*) as `count` FROM exams WHERE CourseID = ? AND ExamDate = ?';
+  const count = (await queryParamPromise(sql1, [courseID, examDate]))[0].count;
+  if (count !== 0) {
+      req.flash('error', 'Exam for the selected course and date already exists');
+      res.redirect('/admin/addExam');
+  } else {
+      const examData = {
+          CourseID: courseID,
+          ExamDate: examDate,
+          TotalMarks: totalMarks,
+      };
+
+      try {
+          const sql2 = 'INSERT INTO exams SET ?';
+          await queryParamPromise(sql2, examData);
+          req.flash('success_msg', 'Exam added successfully');
+          res.redirect('/admin/getAllExams');
+      } catch (error) {
+          console.error("Error inserting exam:", error);
+          req.flash('error', 'Failed to add exam');
+          res.redirect('/admin/addExam');
+      }
+  }
+};
+
+// 1.2 Get all Exams
+exports.getExams = async (req, res, next) => {
+  const sql = `
+      SELECT ExamID, ExamDate, TotalMarks, CourseName
+      FROM exams
+      JOIN courses ON exams.CourseID = courses.CourseID`;
+  const results = await zeroParamPromise(sql);
+  res.render('Admin/Exam/getExams', { data: results, page_name: 'exam' });
+};
+
+// 2.1 Get Exams by Course
+exports.getRelevantExams = async (req, res, next) => {
+  const sql = 'SELECT CourseID, CourseName FROM courses';
+  const results = await zeroParamPromise(sql);
+  let courses = [];
+  for (let i = 0; i < results.length; ++i) {
+    courses.push({ CourseID: results[i].CourseID, CourseName: results[i].CourseName });
+  }
+  res.render('Admin/Exam/selectExam', {
+    courses: courses,
+    page_name: 'exam',
+  });
+};
+
+// 2.2 Post Exams by Course
+exports.postRelevantExams = async (req, res, next) => {
+  const { courseID } = req.body;
+  if (courseID === 'None') {
+    req.flash('error', 'Please select a course');
+    res.redirect('/admin/getExam');
+  } else {
+    const sql = "SELECT ExamID, CourseID, ExamDate, TotalMarks FROM exams WHERE CourseID = ?";
+    const results = await queryParamPromise(sql, [courseID]);
+    res.render('Admin/Exam/getExam', {
+      data: results,
+      page_name: 'exam',
+    });
+  }
+};
+
+exports.getExamSettings = async (req, res, next) => { };
+exports.postExamSettings = async (req, res, next) => { };
+
+
+
+// 2. PARENT CONTACT
+
+// 3. Parent Contacts
+// 3.1 Add Parent Contact
+exports.getAddParentContact = async (req, res, next) => {
+  const sql = 'SELECT StudentID, FirstName, LastName FROM students JOIN person ON students.PersonID = person.PersonID';
+  const students = await zeroParamPromise(sql);
+  res.render('Admin/ParentContact/addParentContact', {
+      students: students,
+      page_name: 'parentcontact',
+  });
+};
+
+exports.postAddParentContact = async (req, res, next) => {
+  const { parentName, phoneNumber, relationship, studentID } = req.body;
+
+  // Basic validation
+  if (phoneNumber.length > 11 || phoneNumber.length < 10) {
+      req.flash('error', 'Enter a valid phone number');
+      return res.redirect('/admin/addParentContact');
+  }
+
+  const parentContactData = {
+      ParentName: parentName,
+      PhoneNumber: phoneNumber,
+      Relationship: relationship,
+      StudentID: studentID,
+  };
+
+  try {
+      // Insert data into parent_contact table
+      const sql = 'INSERT INTO parent_contact SET ?';
+      await queryParamPromise(sql, parentContactData);
+      req.flash('success_msg', 'Parent contact added successfully');
+      res.redirect('/admin/getAllParents');
+  } catch (error) {
+      console.error("Error inserting parent contact:", error);
+      req.flash('error', 'Failed to add parent contact');
+      res.redirect('/admin/addParentContact');
+  }
+};
+
+
+exports.getAllParents = async (req, res, next) => {
+  const sql = `
+      SELECT pc.ParentName, pc.PhoneNumber, pc.Relationship, CONCAT(p.FirstName, ' ', p.LastName) AS StudentName, pc.StudentID
+      FROM parent_contact pc
+      JOIN students s ON pc.StudentID = s.StudentID
+      JOIN person p ON s.PersonID = p.PersonID
+  `;
+  const results = await zeroParamPromise(sql);
+  res.render('Admin/ParentContact/getParentContact', {
+      data: results,
+      page_name: 'parentcontact',
+  });
+};
+
+
+exports.getRelevantParent = async (req, res, next) => {
+  const sql = 'SELECT StudentID, FirstName, LastName FROM students JOIN person ON students.PersonID = person.PersonID';
+  const students = await zeroParamPromise(sql);
+  res.render('Admin/ParentContact/selectParent', {
+      students: students,
+      page_name: 'parentcontact',
+  });
+};
+
+exports.postRelevantParent = async (req, res, next) => {
+  const { studentID } = req.body;
+  if (studentID === 'None') {
+      req.flash('error', 'Please select a student');
+      return res.redirect('/admin/getRelevantParent');
+  } else {
+      const sql = `
+          SELECT pc.ParentName, pc.PhoneNumber, pc.Relationship, CONCAT(p.FirstName, ' ', p.LastName) AS StudentName
+          FROM parent_contact pc
+          JOIN students s ON pc.StudentID = s.StudentID
+          JOIN person p ON s.PersonID = p.PersonID
+          WHERE pc.StudentID = ?
+      `;
+      const results = await queryParamPromise(sql, [studentID]);
+      res.render('Admin/ParentContact/getParentContact', {
+          data: results,
+          page_name: 'parentcontact',
+      });
+  }
+};
+
+
+exports.getParentSettings = async (req, res, next) => {
+  const studentID = req.params.id;
+  const sql = `
+      SELECT pc.ParentName, pc.PhoneNumber, pc.Relationship, pc.StudentID, p.FirstName, p.LastName
+      FROM parent_contact pc
+      JOIN students s ON pc.StudentID = s.StudentID
+      JOIN person p ON s.PersonID = p.PersonID
+      WHERE pc.StudentID = ?
+  `;
+  const results = await queryParamPromise(sql, [studentID]);
+  const parentData = results[0]; // Assuming only one parent contact per student
+  res.render('Admin/ParentContact/setParentContact', {
+      parentData: parentData,
+      page_name: 'parentcontact',
+  });
+};
+
+
+exports.postParentSettings = async (req, res, next) => {
+  const { parentName, phoneNumber, relationship, studentID } = req.body;
+
+  // Basic validation
+  if (phoneNumber.length > 11 || phoneNumber.length < 10) {
+      req.flash('error', 'Enter a valid phone number');
+      return res.redirect(`/admin/settings/parent/${studentID}`);
+  }
+
+  const parentContactData = {
+      ParentName: parentName,
+      PhoneNumber: phoneNumber,
+      Relationship: relationship,
+  };
+
+  try {
+      // Update parent contact information for the selected student
+      const sql = 'UPDATE parent_contact SET ? WHERE StudentID = ?';
+      await queryParamPromise(sql, [parentContactData, studentID]);
+
+      req.flash('success_msg', 'Parent contact updated successfully');
+      res.redirect('/admin/getAllParents');
+  } catch (error) {
+      console.error("Error updating parent contact:", error);
+      req.flash('error', 'Failed to update parent contact');
+      res.redirect(`/admin/settings/parent/${studentID}`);
+  }
+};

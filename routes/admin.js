@@ -122,18 +122,18 @@ router.post('/settings/internship', controller.postInternshipSettings);
 // router.get('/settings/payment/:id', controller.getPaymentSettings);
 // router.post('/settings/payment', controller.postPaymentSettings);
 
-// // 11.EXAMS
-// // 11.1 Get all exams
-// router.get('/getAllExams', controller.getAllExams);
-// // 11.2 Get exams on query
-// router.get('/getExam', controller.getRelevantExam);
-// router.post('/getExam', controller.postRelevantExam);
-// // 11.3 Add exam
-// router.get('/addExam', controller.getAddExam);
-// router.post('/addExam', controller.postAddExam);
-// // 11.4 Modify existing exams
-// router.get('/settings/exam/:id', controller.getExamSettings);
-// router.post('/settings/exam', controller.postExamSettings);
+// 11.EXAMS
+// 11.1 Get all exams
+router.get('/getAllExams', controller.getExams);
+// 11.2 Get exams on query
+router.get('/getExams', controller.getRelevantExams);
+router.post('/getExams', controller.postRelevantExams);
+// 11.3 Add exam
+router.get('/addExam', controller.getAddExam);
+router.post('/addExam', controller.postAddExam);
+// 11.4 Modify existing exams
+router.get('/settings/exam/:id', controller.getExamSettings);
+router.post('/settings/exam', controller.postExamSettings);
 
 // 12.ALUMNI
 // 12.1 Get all alumni
@@ -148,18 +148,18 @@ router.post('/addAlumni', controller.postAddAlumni);
 router.get('/settings/alumni/:id', controller.getAlumniSettings);
 router.post('/settings/alumni', controller.postAlumniSettings);
 
-// // 13.PARENTS
-// // 13.1 Get all parents
-// router.get('/getAllParents', controller.getAllParents);
-// // 13.2 Get parents on query
-// router.get('/getParent', controller.getRelevantParent);
-// router.post('/getParent', controller.postRelevantParent);
-// // 13.3 Add parent
-// router.get('/addParent', controller.getAddParent);
-// router.post('/addParent', controller.postAddParent);
-// // 13.4 Modify existing parents
-// router.get('/settings/parent/:id', controller.getParentSettings);
-// router.post('/settings/parent', controller.postParentSettings);
+// 13.PARENTS
+// 13.1 Get all parents
+router.get('/getAllParents', controller.getAllParents);
+// 13.2 Get parents on query
+router.get('/getParentContacts', controller.getRelevantParent);
+router.post('/getParentContacts', controller.postRelevantParent);
+// 13.3 Add parent
+router.get('/addParentContact', controller.getAddParentContact);
+router.post('/addParentContact', controller.postAddParentContact);
+// 13.4 Modify existing parents
+router.get('/settings/parent/:id', controller.getParentSettings);
+router.post('/settings/parent', controller.postParentSettings);
 
 
 module.exports = router;
