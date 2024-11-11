@@ -23,7 +23,7 @@
                                     <div class="card-header bg-white border-0">
                                         <div class="row align-items-center">
                                             <div class="col-8">
-                                                <h3 class="mb-0" style="color: brown;">All Faculties</h3>
+                                                <h3 class="mb-0" style="color: brown;">All Clubs</h3>
                                             </div>
                                         </div>
                                     </div>
@@ -38,7 +38,7 @@
                                                         <th scope="col">Club ID</th>
                                                         <th scope="col">Club Name</th>
                                                         <th scope="col">Description</th>
-                                                        <th scope="col">Faculty Advisor ID</th>
+                                                        <th scope="col">Faculty Advisor</th>
                                                         <th scope="col">Manage Club</th>
                                                     </tr>
                                                 </thead>
@@ -48,7 +48,7 @@
                                                             <th scope="row"><%= data[i].ClubID %></th>
                                                             <td><%= data[i].ClubName %></td>
                                                             <td><%= data[i].Description %></td>
-                                                            <td><%= data[i].FacultyAdvisorID %></td>
+                                                            <td><%= data[i].Name %></td>
                                                             <td>
                                                                 <a href="/admin/settings/club/<%= data[i].ClubID %>" class="btn btn-sm btn-primary">Settings</a>
                                                             </td>

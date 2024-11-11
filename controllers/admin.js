@@ -66,14 +66,14 @@ exports.getOverview = async (req, res, next) => {
 // 2. STAFFS
 // 2.1 Add staff
 exports.getAddStaff = async (req, res, next) => {
-    const sql = 'SELECT DepartmentID from departments';
+    const sql = 'SELECT DepartmentID, DepartmentName from departments';
     const results = await zeroParamPromise(sql);
-    let departments = [];
-    for (let i = 0; i < results.length; ++i) {
-      departments.push(results[i].DepartmentID);
-    }
+    // let departments = [];
+    // for (let i = 0; i < results.length; ++i) {
+    //   departments.push(results[i].DepartmentID);
+    // }
     res.render('Admin/Staff/addStaff', {
-      departments: departments,
+      departments: results,
       page_name: 'staff',
     });
   };
@@ -138,14 +138,14 @@ exports.postAddStaff = async (req, res, next) => {
 };
 // 2.2 Get staffs on query
 exports.getRelevantStaff = async (req, res, next) => {
-  const sql = 'SELECT DepartmentID from departments';
+  const sql = 'SELECT DepartmentID, DepartmentName from departments';
   const results = await zeroParamPromise(sql);
-  let departments = [];
-  for (let i = 0; i < results.length; ++i) {
-    departments.push(results[i].DepartmentID);
-  }
+  // let departments = [];
+  // for (let i = 0; i < results.length; ++i) {
+  //   departments.push(results[i].DepartmentID);
+  // }
   res.render('Admin/Staff/selectStaff', {
-    departments: departments,
+    departments: results,
     page_name: 'staff',
   });
 };
@@ -157,7 +157,7 @@ exports.postRelevantStaff = async (req, res, next) => {
     res.redirect('/admin/getStaff');
   } else if (department !== 'None') {
     // All teachers from particular department
-    const sql = "select FacultyID, DepartmentID, CONCAT(FirstName, ' ', LastName) AS Name, Email, DateOfBirth from faculty NATURAL JOIN person where DepartmentID = ?";
+    const sql = "select FacultyID, DepartmentID, DepartmentName, CONCAT(FirstName, ' ', LastName) AS Name, Email, DateOfBirth from faculty NATURAL JOIN person NATURAL JOIN departments where DepartmentID = ?";
     const results = await queryParamPromise(sql, [department]);
     return res.render('Admin/Staff/getStaff', {
       data: results,
@@ -170,7 +170,7 @@ exports.postRelevantStaff = async (req, res, next) => {
 
 // 2.3 Get all staffs
 exports.getAllStaff = async (req, res, next) => {
-  const sql = "select FacultyID, DepartmentID, CONCAT(FirstName, ' ', LastName) AS Name, Email, DateOfBirth from faculty NATURAL JOIN person";
+  const sql = "select FacultyID, DepartmentID, DepartmentName, CONCAT(FirstName, ' ', LastName) AS Name, Email, DateOfBirth from faculty NATURAL JOIN person NATURAL JOIN departments";
   const results = await zeroParamPromise(sql);
   res.render('Admin/Staff/getStaff', { data: results, page_name: 'staff' });
 };
@@ -563,7 +563,7 @@ exports.postDeptSettings = async (req, res, next) => {
 exports.getAllCourse = async (req, res, next) => {
   const sql = `
     SELECT CourseID, CourseName, Credits, DepartmentName 
-    FROM courses NATURAL JOIN departments`;
+    FROM courses NATURAL JOIN departments ORDER BY CourseID`;
   const results = await zeroParamPromise(sql);
   res.render('Admin/Course/getCourse', {
     data: results,
@@ -706,7 +706,7 @@ exports.postAddClub = async (req, res, next) => {
 
 // 1.2 Get all clubs
 exports.getAllClubs = async (req, res, next) => {
-  const sql = `SELECT ClubID, ClubName, Description, FacultyAdvisorID FROM clubs`;
+  const sql = `SELECT ClubID, ClubName, Description, CONCAT(FirstName, " ", LastName) AS Name FROM clubs NATURAL JOIN Faculty NATURAL JOIN Person`;
   const results = await zeroParamPromise(sql);
   res.render('Admin/Club/getClubs', { data: results, page_name: 'clubs' });
 };
@@ -742,16 +742,14 @@ exports.postClubSettings = async (req, res, next) => {
 
 // 1.2 Get relevant clubs based on query
 exports.getRelevantClub = async (req, res, next) => {
-  const { facultyAdvisorID } = req.query;
-
-  let sql = 'SELECT ClubID, ClubName, Description, FacultyAdvisorID FROM clubs';
+  let sql = "SELECT ClubID, ClubName, Description, CONCAT(FirstName, ' ', LastName) AS Name FROM clubs JOIN faculty ON clubs.FacultyAdvisorID=faculty.FacultyID JOIN person ON person.PersonID=faculty.FacultyID;";
   let params = [];
 
   // If a facultyAdvisorID is provided, filter by it
-  if (facultyAdvisorID) {
-    sql += ' WHERE FacultyAdvisorID = ?';
-    params.push(facultyAdvisorID);
-  }
+  // if (facultyAdvisorID) {
+  //   sql += ' WHERE FacultyAdvisorID = ?';
+  //   params.push(facultyAdvisorID);
+  // }
 
   const results = await queryParamPromise(sql, params);
   res.render('Admin/Club/getClubs', { data: results, page_name: 'clubs' });

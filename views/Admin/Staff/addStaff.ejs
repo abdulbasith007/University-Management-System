@@ -70,7 +70,7 @@
                                                 <label class="form-control-label" for="department">Department</label>
                                                 <select class="form-control" id="department" name="department" required>
                                                   <% for(const department of departments) { %>
-                                                    <option><%= department %></option>
+                                                    <option value="<%= department.DepartmentID %>"><%= department.DepartmentName %></option>
                                                   <% } %>
                                                 </select>
                                               </div>
