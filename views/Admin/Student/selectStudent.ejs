@@ -32,32 +32,18 @@
                                         </div>
                                     </div>
                                     <div class="card-body">
-                                        <form action="/admin/getStudent" method="POST">
-                                            <h6 class="heading-small text-muted mb-4">Student Information</h6>
+                                        <%- include('../../Includes/messages') %>
+                                        <form action="/admin/getRelevantStudents" method="POST">
+                                            <h6 class="heading-small text-muted mb-4">Select Course</h6>
                                             <div class="pl-lg-4">
                                                 <div class="row">
-                                                    <div class="col-lg-6">
+                                                    <div class="col-lg-12">
                                                         <div class="form-group">
-                                                            <label class="form-control-label"
-                                                                for="section">Section</label>
-                                                            <input type="number" id="section" name="section"
-                                                                class="form-control form-control-alternative"
-                                                                placeholder="Section">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-6">
-                                                        <div class="form-group">
-                                                            <label class="form-control-label"
-                                                                for="department">Department</label>
-                                                            <select class="form-control" id="department"
-                                                                name="department">
-                                                                <option>
-                                                                    None
-                                                                </option>
-                                                                <% for(const department of departments) { %>
-                                                                <option>
-                                                                    <%= department %>
-                                                                </option>
+                                                            <label class="form-control-label" for="courseId">Course</label>
+                                                            <select class="form-control" id="courseId" name="courseId" required>
+                                                                <option value="None">None</option>
+                                                                <% for(const course of courses) { %>
+                                                                    <option value="<%= course.CourseID %>"><%= course.CourseName %></option>
                                                                 <% } %>
                                                             </select>
                                                         </div>
@@ -65,10 +51,10 @@
                                                 </div>
                                             </div>
                                             <hr class="my-4">
-                                            <button type="submit" class="btn btn-primary btn-block">SEE RELEVANT
-                                                STUDENTS</button>
+                                            <button type="submit" class="btn btn-primary btn-block">View Students</button>
                                         </form>
                                     </div>
+                                    
                                 </div>
                             </div>
                         </div>

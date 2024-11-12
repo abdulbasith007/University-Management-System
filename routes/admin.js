@@ -29,10 +29,12 @@ router.post('/settings/staff', controller.postStaffSettings);
 router.get('/addStudent', controller.getAddStudent);
 router.post('/addStudent', controller.postAddStudent);
 // 3.2 Get Students on query
-router.get('/getStudent', controller.getRelevantStudent);
-router.post('/getStudent', controller.postRelevantStudent);
+router.get('/getStudent', controller.getRelevantStudents);
+router.post('/getStudent', controller.postRelevantStudents);
+router.get('/getRelevantStudents', controller.getRelevantStudents);
+router.post('/getRelevantStudents', controller.postRelevantStudents);
 // 3.3 Get all Students
-router.get('/getAllStudents', controller.getAllStudent);
+router.get('/getAllStudents', controller.getAllStudents);
 // 3.4 Modify existing students
 router.get('/settings/student/:id', controller.getStudentSettings);
 router.post('/settings/student', controller.postStudentSettings);

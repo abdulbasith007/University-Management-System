@@ -229,114 +229,123 @@ exports.postStaffSettings = async (req, res, next) => {
 
 // 3. STUDENTS
 // 3.1 Add student
+// 1. STUDENTS
+// 1.1 Add Student
 exports.getAddStudent = async (req, res, next) => {
-  const sql = 'SELECT DepartmentID from departments';
-  const results = await zeroParamPromise(sql);
-  let departments = [];
-  for (let i = 0; i < results.length; ++i) {
-    departments.push(results[i].DepartmentID);
-  }
+  const sql = 'SELECT * FROM courses';  // Assuming you want to list available courses
+  const courses = await zeroParamPromise(sql); // Fetch available courses
   res.render('Admin/Student/addStudent', {
-    page_name: 'students',
-    departments: departments,
+      courses: courses,
+      page_name: 'students',
   });
 };
+
 exports.postAddStudent = async (req, res, next) => {
-  const {
-    email,
-    dob,
-    name,
-    gender,
-    department,
-    address,
-    city,
-    postalCode,
-    contact,
-  } = req.body;
-  const password = dob.toString().split('-').join('');
-  const hashedPassword = await hashing(password);
-  const sql1 =
-    'select count(*) as `count`, section from student where section = (select max(section) from student where dept_id = ?) AND dept_id = ?';
-  const results = await queryParamPromise(sql1, [department, department]);
-  let section = 1;
-  if (results[0].count !== 0) {
-    if (results[0].count == SECTION_LIMIT) {
-      section = results[0].section + 1;
-    } else {
-      section = results[0].section;
-    }
+  const { email, courseId } = req.body;
+  const sql1 = 'SELECT count(*) as `count` FROM person WHERE Email = ?';
+  const count = (await queryParamPromise(sql1, [email]))[0].count;
+  if (count !== 0) {
+      req.flash('error', 'Student with that email already exists');
+      res.redirect('/admin/addStudent');
+  } else {
+      const {
+          dob,
+          firstName,
+          lastName,
+          address,
+          city,
+          postalCode,
+          contact,
+          state,
+      } = req.body;
+
+      if (contact.length > 11) {
+          req.flash('error', 'Enter a valid phone number');
+          return res.redirect('/admin/addStudent');
+      }
+
+      const personData = {
+          FirstName: firstName,
+          LastName: lastName,
+          Email: email,
+          City: city,
+          State: state,
+          ZipCode: postalCode,
+          DateOfBirth: dob,
+      };
+
+      try {
+          // Insert data into the person table and retrieve the last inserted PersonID
+          const sql2 = 'INSERT INTO person SET ?';
+          const personResult = await queryParamPromise(sql2, personData);
+          const personId = personResult.insertId; // Get the auto-incremented PersonID
+
+          // Insert data into the student table with the obtained PersonID
+          const studentData = {
+              EnrollmentDate: new Date(),
+              PersonID: personId,
+          };
+          const sql3 = 'INSERT INTO students SET ?';
+          const r = await queryParamPromise(sql3, studentData);
+
+          // Assuming you also want to assign courses to the student
+          if (courseId) {
+              const courseData = {
+                  StudentID: r.insertId,
+                  CourseID: courseId,
+              };
+              const sql4 = 'INSERT INTO student_course_mapping SET ?';
+              await queryParamPromise(sql4, courseData);
+          }
+
+          req.flash('success_msg', 'Student added successfully');
+          res.redirect('/admin/getAllStudents');
+      } catch (error) {
+          console.error("Error inserting student:", error);
+          req.flash('error', 'Failed to add student');
+          res.redirect('/admin/addStudent');
+      }
   }
-  const sql2 = 'INSERT INTO STUDENT SET ?';
-  await queryParamPromise(sql2, {
-    s_id: uuidv4(),
-    s_name: name,
-    gender: gender,
-    dob: dob,
-    email: email,
-    s_address: address + '-' + city + '-' + postalCode,
-    contact: contact,
-    password: hashedPassword,
-    section: section,
-    dept_id: department,
-  });
-  req.flash('success_msg', 'Student added successfully');
-  res.redirect('/admin/getAllStudents');
 };
 
 // 3.2 Get students on query
-exports.getRelevantStudent = async (req, res, next) => {
-  const sql = 'SELECT DepartmentID from departments';
-  const results = await zeroParamPromise(sql);
-  let departments = [];
-  for (let i = 0; i < results.length; ++i) {
-    departments.push(results[i].DepartmentID);
-  }
-  res.render('Admin/Student/deptSelect', {
-    departments: departments,
-    page_name: 'students',
+// 1.3 Get Students by Course
+exports.getRelevantStudents = async (req, res, next) => {
+  const sql = 'SELECT CourseID, CourseName from courses';
+  const results = await zeroParamPromise(sql); // Fetch available courses
+  res.render('Admin/Student/selectStudent', {
+      courses: results,
+      page_name: 'students',
   });
 };
 
-exports.postRelevantStudent = async (req, res, next) => {
-  let { section, department } = req.body;
-  if (!section && department === 'None') {
-    const results = await zeroParamPromise('SELECT * FROM student');
-    res.render('Admin/Student/getStudent', {
-      data: results,
-      page_name: 'students',
-    });
-  } else if (!section) {
-    const sql = 'SELECT * FROM student WHERE dept_id = ?';
-    const results = await queryParamPromise(sql, [department]);
-    res.render('Admin/Student/getStudent', {
-      data: results,
-      page_name: 'students',
-    });
-  } else if (department === 'None') {
-    const sql = 'SELECT * FROM student WHERE section = ?';
-    const results = await queryParamPromise(sql, [section]);
-    res.render('Admin/Student/getStudent', {
-      data: results,
-      page_name: 'students',
-    });
-  } else if (section && department !== 'None') {
-    const sql =
-      'SELECT * FROM student WHERE section = ? AND dept_id = ? GROUP BY s_id';
-    const results = await queryParamPromise(sql, [section, department]);
-    res.render('Admin/Student/getStudent', {
-      data: results,
-      page_name: 'students',
-    });
+exports.postRelevantStudents = async (req, res, next) => {
+  const { courseId } = req.body;
+  if (courseId === 'None') {
+      req.flash('error', 'Please select a course');
+      res.redirect('/admin/getRelevantStudents');
+  } else {
+      const sql = `
+          SELECT StudentID, CONCAT(FirstName, ' ', LastName) AS Name, Email, DateOfBirth
+          FROM students
+          NATURAL JOIN person
+          WHERE StudentID IN (SELECT StudentID FROM student_course_mapping WHERE CourseID = ?)
+      `;
+      const results = await queryParamPromise(sql, [courseId]);
+      res.render('Admin/Student/getStudents', {
+          data: results,
+          page_name: 'students',
+      });
   }
 };
 
 // 3.3 Get all students
-exports.getAllStudent = async (req, res, next) => {
-  const sql = 'SELECT * from student';
+exports.getAllStudents = async (req, res, next) => {
+  const sql = "SELECT StudentID, CONCAT(FirstName, ' ', LastName) AS Name, Email, DateOfBirth, City, State FROM students NATURAL JOIN person";
   const results = await zeroParamPromise(sql);
-  res.render('Admin/Student/getStudent', {
-    data: results,
-    page_name: 'students',
+  res.render('Admin/Student/getStudents', {
+      data: results,
+      page_name: 'students',
   });
 };
 
