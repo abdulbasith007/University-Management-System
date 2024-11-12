@@ -157,7 +157,7 @@ exports.postRelevantStaff = async (req, res, next) => {
     res.redirect('/admin/getStaff');
   } else if (department !== 'None') {
     // All teachers from particular department
-    const sql = "select FacultyID, DepartmentID, DepartmentName, CONCAT(FirstName, ' ', LastName) AS Name, Email, DateOfBirth from faculty NATURAL JOIN person NATURAL JOIN departments where DepartmentID = ?";
+    const sql = "SELECT * FROM Faculty_Person_Department where DepartmentID = ?";
     const results = await queryParamPromise(sql, [department]);
     return res.render('Admin/Staff/getStaff', {
       data: results,
@@ -170,7 +170,7 @@ exports.postRelevantStaff = async (req, res, next) => {
 
 // 2.3 Get all staffs
 exports.getAllStaff = async (req, res, next) => {
-  const sql = "select FacultyID, DepartmentID, DepartmentName, CONCAT(FirstName, ' ', LastName) AS Name, Email, DateOfBirth from faculty NATURAL JOIN person NATURAL JOIN departments";
+  const sql = "SELECT * FROM Faculty_Person_Department";
   const results = await zeroParamPromise(sql);
   res.render('Admin/Staff/getStaff', { data: results, page_name: 'staff' });
 };
@@ -302,7 +302,12 @@ exports.postAddStudent = async (req, res, next) => {
           res.redirect('/admin/getAllStudents');
       } catch (error) {
           console.error("Error inserting student:", error);
-          req.flash('error', 'Failed to add student');
+          if(error.sqlState === '45000') {
+            req.flash('error', 'Failed to add student. The Student must be at least 16 years of age.');
+          }
+          else {
+            req.flash('error', 'Failed to add student');
+          }
           res.redirect('/admin/addStudent');
       }
   }
@@ -412,103 +417,6 @@ exports.postStudentSettings = async (req, res, next) => {
   res.redirect('/admin/getAllStudents');
 };
 
-// 4. CLASSES
-
-// 4.1 Select Class
-exports.getClass = async (req, res, next) => {
-  const sql = 'SELECT * FROM class';
-  const results = await zeroParamPromise(sql);
-  const staffData = [];
-  for (const result of results) {
-    const staffName = (
-      await queryParamPromise(
-        'SELECT st_name FROM STAFF WHERE st_id = ?',
-        result.st_id
-      )
-    )[0].st_name;
-    staffData.push(staffName);
-  }
-  res.render('Admin/Class/getClass', {
-    data: results,
-    staffData: staffData,
-    page_name: 'classes',
-  });
-};
-
-// 4.2 Add class
-exports.getAddClass = async (req, res, next) => {
-  const results = await zeroParamPromise('SELECT c_id from course');
-  let courses = [];
-  for (let i = 0; i < results.length; ++i) {
-    courses.push(results[i].c_id);
-  }
-  const staffs = await zeroParamPromise(
-    'SELECT st_id, email, dept_id from staff'
-  );
-  res.render('Admin/Class/addClass', {
-    page_name: 'classes',
-    courses: courses,
-    staffs: staffs,
-  });
-};
-
-exports.postAddClass = async (req, res, next) => {
-  let { course, staff, section } = req.body;
-  staff = staff.split(' ')[0];
-  const sql1 = 'SELECT st_id, dept_id from staff where email = ?';
-  const staffData = (await queryParamPromise(sql1, [staff]))[0];
-  const sql2 = 'SELECT semester, dept_id from course where c_id = ?';
-  const courseData = (await queryParamPromise(sql2, [course]))[0];
-  if (staffData.dept_id !== courseData.dept_id) {
-    req.flash('error', 'The staff and course are of different department');
-    return res.redirect('/admin/addClass');
-  }
-  const sql3 =
-    'select max(section) as `max_section` from student where dept_id = ?';
-  const max_section = (await queryParamPromise(sql3, [staffData.dept_id]))[0]
-    .max_section;
-  if (section <= 0 || section > max_section) {
-    req.flash('error', 'The section for the given department does not exist');
-    return res.redirect('/admin/addClass');
-  }
-  const sql4 = 'INSERT INTO class set ?';
-  await queryParamPromise(sql4, {
-    section: section,
-    semester: courseData.semester,
-    c_id: course,
-    st_id: staffData.st_id,
-  });
-  res.redirect('/admin/getClass');
-};
-
-// 4.3 Modify existing classes
-exports.getClassSettings = async (req, res, next) => {
-  const classId = req.params.id;
-  const sql1 = 'SELECT * from class WHERE class_id = ?';
-  const classData = await queryParamPromise(sql1, [classId]);
-  const sql2 = 'SELECT c_id from course';
-  const courseData = await zeroParamPromise(sql2);
-  const sql3 = 'SELECT st_id, st_name, email from staff';
-  const staffData = await zeroParamPromise(sql3);
-  const sql4 = 'SELECT st_id, email FROM staff WHERE st_id = ?';
-  const staffEmail = await queryParamPromise(sql4, [classData[0].st_id]);
-  res.render('Admin/Class/setClass', {
-    classData,
-    courseData,
-    staffData,
-    staffEmail: staffEmail[0],
-    page_name: 'classes',
-  });
-};
-
-exports.postClassSettings = async (req, res, next) => {
-  const { staff, course, section, classId } = req.body;
-  const sql =
-    'UPDATE class SET st_id = ?, c_id = ?, section = ? WHERE class_id = ?';
-  await queryParamPromise(sql, [staff, course, section, classId]);
-  req.flash('success_msg', 'Class changed successfully!');
-  res.redirect('/admin/getClass');
-};
 
 // 5. DEPARTMENTS
 // 5.1 Select department
@@ -816,7 +724,7 @@ exports.postAddScholarship = async (req, res, next) => {
       res.redirect('/admin/getScholarships');
     } catch (error) {
       console.error("Error adding scholarship:", error);
-      req.flash('error', 'Failed to add scholarship');
+      req.flash('error', 'Failed to add scholarship. The amount should not exceed 5000.');
       res.redirect('/admin/addScholarship');
     }
   }
@@ -1169,7 +1077,7 @@ exports.postAddExam = async (req, res, next) => {
           res.redirect('/admin/getAllExams');
       } catch (error) {
           console.error("Error inserting exam:", error);
-          req.flash('error', 'Failed to add exam');
+          req.flash('error', 'Failed to add exam. The total marks should be between 0 and 100.');
           res.redirect('/admin/addExam');
       }
   }
@@ -1180,7 +1088,7 @@ exports.getExams = async (req, res, next) => {
   const sql = `
       SELECT ExamID, ExamDate, TotalMarks, CourseName
       FROM exams
-      JOIN courses ON exams.CourseID = courses.CourseID`;
+      JOIN courses ON exams.CourseID = courses.CourseID ORDER BY ExamID`;
   const results = await zeroParamPromise(sql);
   res.render('Admin/Exam/getExams', { data: results, page_name: 'exam' });
 };
@@ -1225,7 +1133,7 @@ exports.postExamSettings = async (req, res, next) => { };
 // 3. Parent Contacts
 // 3.1 Add Parent Contact
 exports.getAddParentContact = async (req, res, next) => {
-  const sql = 'SELECT StudentID, FirstName, LastName FROM students JOIN person ON students.PersonID = person.PersonID';
+  const sql = 'SELECT * from Student_Person';
   const students = await zeroParamPromise(sql);
   res.render('Admin/ParentContact/addParentContact', {
       students: students,
@@ -1279,7 +1187,7 @@ exports.getAllParents = async (req, res, next) => {
 
 
 exports.getRelevantParent = async (req, res, next) => {
-  const sql = 'SELECT StudentID, FirstName, LastName FROM students JOIN person ON students.PersonID = person.PersonID';
+  const sql = 'SELECT * from Student_Person';
   const students = await zeroParamPromise(sql);
   res.render('Admin/ParentContact/selectParent', {
       students: students,

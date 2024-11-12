@@ -63,7 +63,7 @@
                                                             <label class="form-control-label" for="student">Student</label>
                                                             <select class="form-control" id="student" name="studentID" required>
                                                                 <% for(const student of students) { %>
-                                                                    <option value="<%= student.StudentID %>"><%= student.FirstName + ' ' + student.LastName %></option>
+                                                                    <option value="<%= student.StudentID %>"><%= student.Name %></option>
                                                                 <% } %>
                                                             </select>
                                                         </div>

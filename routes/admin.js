@@ -39,16 +39,6 @@ router.get('/getAllStudents', controller.getAllStudents);
 router.get('/settings/student/:id', controller.getStudentSettings);
 router.post('/settings/student', controller.postStudentSettings);
 
-// 4.CLASSES (subjects mapping courses ,staffs and section)
-// 4.1 Select class
-router.get('/getClass', controller.getClass);
-// 4.2 Add class
-router.get('/addClass', controller.getAddClass);
-router.post('/addClass', controller.postAddClass);
-// 4.3 Modify existing classes
-router.get('/settings/class/:id', controller.getClassSettings);
-router.post('/settings/class', controller.postClassSettings);
-
 // 5.DEPARTMENTS
 // 5.1 Select department
 router.get('/getDept', controller.getDept);

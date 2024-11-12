@@ -1,3 +1,5 @@
+DROP DATABASE IF EXISTS cumsdbms1;
+
 CREATE DATABASE cumsdbms1;
 
 USE cumsdbms1;
@@ -53,14 +55,16 @@ CREATE TABLE IF NOT EXISTS `Exams` (
     `ExamDate` DATE NOT NULL,
     `TotalMarks` INT UNSIGNED NOT NULL,
     PRIMARY KEY (`ExamID`),
-    FOREIGN KEY (`CourseID`) REFERENCES `Courses`(`CourseID`) ON UPDATE CASCADE ON DELETE RESTRICT
+    FOREIGN KEY (`CourseID`) REFERENCES `Courses`(`CourseID`) ON UPDATE CASCADE ON DELETE RESTRICT,
+    CHECK (`TotalMarks` >  0 AND `TotalMarks` <= 100)
 );
 
 CREATE TABLE IF NOT EXISTS `Scholarships` (
     `ScholarshipID` INT UNSIGNED AUTO_INCREMENT,
     `Amount` DECIMAL(10,2) NOT NULL,
     `EligibilityCriteria` TEXT,
-    PRIMARY KEY (`ScholarshipID`)
+    PRIMARY KEY (`ScholarshipID`),
+    CHECK (`Amount` <= 5000)
 );
 
 CREATE TABLE IF NOT EXISTS `Clubs` (
@@ -78,7 +82,8 @@ CREATE TABLE IF NOT EXISTS `Payments` (
     `Amount` DECIMAL(10,2) NOT NULL,
     `PaymentDate` DATE NOT NULL,
     PRIMARY KEY (`PaymentID`),
-    FOREIGN KEY (`StudentID`) REFERENCES `Students`(`StudentID`) ON UPDATE CASCADE ON DELETE RESTRICT
+    FOREIGN KEY (`StudentID`) REFERENCES `Students`(`StudentID`) ON UPDATE CASCADE ON DELETE RESTRICT,
+    CHECK (`Amount` > 0)
 );
 
 CREATE TABLE IF NOT EXISTS `Alumni` (
@@ -157,3 +162,36 @@ CREATE TABLE IF NOT EXISTS `Person_PhoneNumbers` (
     PRIMARY KEY (`PersonID`, `PhoneNumber`),
     FOREIGN KEY (`PersonID`) REFERENCES `Person`(`PersonID`) ON UPDATE CASCADE ON DELETE RESTRICT
 );
+
+CREATE VIEW Faculty_Person_Department AS
+SELECT FacultyID, DepartmentID, DepartmentName, CONCAT(FirstName, ' ', LastName) AS Name, Email, DateOfBirth 
+FROM faculty NATURAL JOIN person NATURAL JOIN departments;
+
+CREATE VIEW Student_Person AS
+SELECT StudentID, CONCAT(FirstName, " ", LastName) AS Name 
+FROM students JOIN person ON students.PersonID = person.PersonID;
+
+DELIMITER //
+
+CREATE TRIGGER before_insert_students
+BEFORE INSERT ON Students
+FOR EACH ROW
+BEGIN
+  DECLARE dob DATE;
+  DECLARE age INT;
+  
+  -- Retrieve the DateOfBirth into a variable to avoid subquery issues
+  SELECT DateOfBirth INTO dob 
+  FROM Person 
+  WHERE PersonID = NEW.PersonID;
+
+  SET age = TIMESTAMPDIFF(YEAR, dob, CURDATE());
+  
+  IF age < 16 THEN
+    SIGNAL SQLSTATE '45000' 
+    SET MESSAGE_TEXT = 'Student must be at least 16 years old to enroll';
+  END IF;
+END;
+//
+
+DELIMITER ;
