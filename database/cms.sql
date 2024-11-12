@@ -1,8 +1,8 @@
-DROP DATABASE IF EXISTS cumsdbms1;
+DROP DATABASE IF EXISTS university_management_system;
 
-CREATE DATABASE cumsdbms1;
+CREATE DATABASE university_management_system;
 
-USE cumsdbms1;
+USE university_management_system;
 
 CREATE TABLE IF NOT EXISTS `Departments` (
     `DepartmentID` INT UNSIGNED AUTO_INCREMENT,
