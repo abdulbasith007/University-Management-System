@@ -39,6 +39,7 @@
                                                         <th scope="col">#</th>
                                                         <th scope="col">COURSE NAME</th>
                                                         <th scope="col">Credits</th>
+                                                        <th scope="col">Faculty</th>
                                                         <th scope="col">Department</th>
                                                         <th scope="col">Manage Course</th>
                                                     </tr>
@@ -49,6 +50,7 @@
                                                         <th scope="row"><%= data[i].CourseID %></th>
                                                         <td><%= data[i].CourseName %></td>
                                                         <td><%= data[i].Credits %></td>
+                                                        <td><%= data[i].Name %></td>
                                                         <td><%= data[i].DepartmentName %></td>
                                                         <td><a href="/admin/settings/course/<%= data[i].c_id %>"
                                                                 class="btn btn-sm btn-primary">Settings</a></td>

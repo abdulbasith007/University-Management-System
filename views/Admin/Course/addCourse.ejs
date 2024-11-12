@@ -54,23 +54,30 @@
                                             </select>
                                           </div>
                                       
+                                          <!-- Faculty Dropdowns -->
+                                          <div id="faculty-selection">
+                                            <div class="form-group">
+                                              <label for="faculty">Faculty</label>
+                                              <select class="form-control" name="faculty[]">
+                                                <option value="" disabled selected>Select Faculty</option>
+                                                <% faculties.forEach(faculty => { %>
+                                                  <option value="<%= faculty.FacultyID %>"><%= faculty.Name %></option>
+                                                <% }); %>
+                                              </select>
+                                            </div>
+                                          </div>
+
+                                          <button type="button" id="add-faculty" class="btn btn-link">+ Assign Another Faculty</button>
+                                      
                                           <!-- Submit Button -->
                                           <button type="submit" class="btn btn-primary">Add Course</button>
                                         </form>
                                       </div>
-                                      
-                                      
                                 </div>
                             </div>
-
-
                         </div>
                     </div>
                 </div>
-
-
-
-
             </main>
         </section>
 
@@ -78,6 +85,23 @@
 
 </div>
 
-
+<script>
+  // JavaScript to dynamically add another faculty dropdown
+  document.getElementById('add-faculty').addEventListener('click', function () {
+      const facultyDiv = document.getElementById('faculty-selection');
+      const newFacultyRow = document.createElement('div');
+      newFacultyRow.classList.add('form-group');
+      newFacultyRow.innerHTML = `
+          <label for="faculty">Faculty</label>
+          <select class="form-control" name="faculty[]">
+            <option value="" disabled selected>Select Faculty</option>
+            <% faculties.forEach(faculty => { %>
+              <option value="<%= faculty.FacultyID %>"><%= faculty.Name %></option>
+            <% }); %>
+          </select>
+      `;
+      facultyDiv.appendChild(newFacultyRow);
+  });
+</script>
 
 <%- include('../../Includes/admin_end.ejs') %>

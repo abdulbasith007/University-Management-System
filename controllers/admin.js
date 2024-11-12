@@ -478,9 +478,7 @@ exports.postDeptSettings = async (req, res, next) => {
 // 6. COURSE
 // 6.1 Get all courses
 exports.getAllCourse = async (req, res, next) => {
-  const sql = `
-    SELECT CourseID, CourseName, Credits, DepartmentName 
-    FROM courses NATURAL JOIN departments ORDER BY CourseID`;
+  let sql = `select CourseID, CourseName, Credits, DepartmentName, CONCAT(FirstName, " ", LastName) AS Name from courses NATURAL JOIN faculty_course_mapping JOIN faculty on faculty.facultyID = faculty_course_mapping.facultyID JOIN departments ON departments.departmentID = courses.departmentID NATURAL JOIN person ORDER BY CourseID`;
   const results = await zeroParamPromise(sql);
   res.render('Admin/Course/getCourse', {
     data: results,
@@ -500,9 +498,7 @@ exports.getRelevantCourse = async (req, res, next) => {
 exports.postRelevantCourse = async (req, res, next) => {
   const { semester, department } = req.body;
 
-  let sql = `
-    SELECT CourseID, CourseName, Credits, DepartmentName 
-    FROM courses NATURAL JOIN departments`;
+  let sql = `select CourseID, CourseName, Credits, DepartmentName, CONCAT(FirstName, " ", LastName) AS Name from courses NATURAL JOIN faculty_course_mapping JOIN faculty on faculty.facultyID = faculty_course_mapping.facultyID JOIN departments ON departments.departmentID = courses.departmentID NATURAL JOIN person ORDER BY CourseID`;
   const params = [];
 
   if (department !== 'None') {
@@ -526,26 +522,51 @@ exports.postRelevantCourse = async (req, res, next) => {
 // 6.3 Add course
 exports.getAddCourse = async (req, res, next) => {
   const departments = await zeroParamPromise('SELECT DepartmentID, DepartmentName FROM departments');
+  const faculties = await zeroParamPromise('SELECT FacultyID, CONCAT(FirstName, " ", LastName) AS Name FROM faculty JOIN person ON faculty.PersonID = person.PersonID');
   res.render('Admin/Course/addCourse', {
     departments,
+    faculties,  // Pass the faculties list to the view
     page_name: 'courses',
   });
 };
 
+
 exports.postAddCourse = async (req, res, next) => {
   const { course, credits, department } = req.body;
+  const faculty = req.body['faculty[]'];
 
+  // Insert the course data into the 'courses' table
   const courseData = {
     CourseName: course,
     Credits: credits,
     DepartmentID: department,
   };
-  const sql = 'INSERT INTO courses SET ?';
-  await queryParamPromise(sql, courseData);
+  const sqlCourse = 'INSERT INTO courses SET ?';
+  const result = await queryParamPromise(sqlCourse, courseData);
 
+  // Get the CourseID of the newly inserted course
+  const courseID = result.insertId;
+
+  // If faculty are provided, insert them into the Faculty_Course_Mapping table
+  if (faculty && Array.isArray(faculty)) {
+    const mappingPromises = faculty.map(facultyID => {
+      const mappingData = {
+        FacultyID: facultyID,
+        CourseID: courseID
+      };
+      const sqlMapping = 'INSERT INTO faculty_course_mapping SET ?';
+      return queryParamPromise(sqlMapping, mappingData);
+    });
+
+    // Wait for all the faculty mappings to be inserted
+    await Promise.all(mappingPromises);
+  }
+
+  // Flash message and redirect after successfully adding the course
   req.flash('success_msg', 'Course added successfully');
   res.redirect('/admin/getAllCourses');
 };
+
 
 
 
