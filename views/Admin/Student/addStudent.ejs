@@ -1,5 +1,4 @@
 <%- include('../../Includes/begin.ejs') %>
-
 <link rel="stylesheet" href="../../CSS/admin-dashboard.css">
 
 <div class="container-fluid">
@@ -110,12 +109,17 @@
                                                     </div>
                                                 </div>
                                                 <div class="row">
-                                                    <div class="col-lg-4">
-                                                        <div class="form-group">
-                                                            <label class="form-control-label" for="contact">Contact No.</label>
-                                                            <input type="text" id="contact" name="contact" class="form-control form-control-alternative" placeholder="0000000000" required>
+                                                    <div id="phone-numbers">
+                                                        <div class="row phone-number-row">
+                                                            <div class="col-lg-12">
+                                                                <div class="form-group">
+                                                                    <label class="form-control-label" for="contact">Contact No.</label>
+                                                                    <input type="text" name="contact[]" class="form-control form-control-alternative" placeholder="0000000000" required style="width: 100%;">
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
+                                                    <button type="button" id="add-phone-number" class="btn btn-link">+ Add Another Number</button>
                                                 </div>
                                             </div>
                                             <hr class="my-4">
@@ -131,7 +135,24 @@
                     </div>
                 </div>
 
-
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        document.getElementById('add-phone-number').addEventListener('click', function () {
+                            const phoneNumbersDiv = document.getElementById('phone-numbers');
+                            const newPhoneNumberRow = document.createElement('div');
+                            newPhoneNumberRow.classList.add('row', 'phone-number-row');
+                            newPhoneNumberRow.innerHTML = `
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label class="form-control-label">Contact No.</label>
+                                        <input type="text" name="contact[]" class="form-control form-control-alternative" placeholder="0000000000" required style="width: 100%;">
+                                    </div>
+                                </div>
+                            `;
+                            phoneNumbersDiv.appendChild(newPhoneNumberRow);
+                        });
+                    });
+                </script>
 
 
             </main>

@@ -1,7 +1,6 @@
 const path = require('path');
 const env = require('dotenv');
 const express = require('express');
-const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const flash = require('connect-flash');
 const session = require('express-session');
@@ -39,23 +38,23 @@ app.use((req, res, next) => {
   next();
 });
 
+// Middleware for parsing bodies
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+app.use(cookieParser());
+
+// Serving static files
+app.use(express.static(path.join(__dirname, 'public')));
+
 const adminRoutes = require('./routes/admin');
 // const staffRoutes = require('./routes/staff');
 // const studentRoutes = require('./routes/student');
 const homeRoutes = require('./routes/home');
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(express.static(__dirname + '/public'));
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
-app.use(cookieParser());
-
 app.use('/admin', adminRoutes);
 // app.use('/staff', staffRoutes);
 // app.use('/student', studentRoutes);
 app.use('/', homeRoutes);
-
-app.use(homeRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

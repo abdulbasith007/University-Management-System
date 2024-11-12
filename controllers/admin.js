@@ -255,14 +255,10 @@ exports.postAddStudent = async (req, res, next) => {
           address,
           city,
           postalCode,
-          contact,
           state,
       } = req.body;
-
-      if (contact.length > 11) {
-          req.flash('error', 'Enter a valid phone number');
-          return res.redirect('/admin/addStudent');
-      }
+      console.log(req.body);
+      const contact = req.body['contact[]'];
 
       const personData = {
           FirstName: firstName,
@@ -288,14 +284,17 @@ exports.postAddStudent = async (req, res, next) => {
           const sql3 = 'INSERT INTO students SET ?';
           const r = await queryParamPromise(sql3, studentData);
 
-          // Assuming you also want to assign courses to the student
-          if (courseId) {
-              const courseData = {
-                  StudentID: r.insertId,
-                  CourseID: courseId,
-              };
-              const sql4 = 'INSERT INTO student_course_mapping SET ?';
-              await queryParamPromise(sql4, courseData);
+          // Insert each phone number into the person_phoneNumber table
+          if (Array.isArray(contact)) {
+              const phonePromises = contact.map(phoneNumber => {
+                  const phoneData = {
+                      PersonID: personId,
+                      PhoneNumber: phoneNumber
+                  };
+                  const sql4 = 'INSERT INTO person_phoneNumbers SET ?';
+                  return queryParamPromise(sql4, phoneData);
+              });
+              await Promise.all(phonePromises);
           }
 
           req.flash('success_msg', 'Student added successfully');
@@ -312,6 +311,7 @@ exports.postAddStudent = async (req, res, next) => {
       }
   }
 };
+
 
 // 3.2 Get students on query
 // 1.3 Get Students by Course
