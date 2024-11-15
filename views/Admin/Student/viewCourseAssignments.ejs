@@ -1,0 +1,93 @@
+<%- include('../../Includes/begin.ejs') %>
+<link rel="stylesheet" href="../../CSS/admin-dashboard.css">
+
+<div class="container-fluid">
+    <div id="wrapper">
+        <%- include('../../Includes/admin_nav.ejs') %>
+
+        <section id="content-wrapper">
+            <main role="main" class="pt-5 main">
+                <div class="main-content">
+                    <div class="header pb-4 pb-sm-8 pt-5 pt-lg-8 d-flex align-items-center" style="height: 100px; background-size: cover; background-position: center top;">
+                    </div>
+                    <div class="container-fluid mt--7">
+                        <div class="row">
+                            <div class="col-xl-12 order-xl-1">
+                                <div class="card bg-secondary shadow">
+                                    <div class="card-header bg-white border-0">
+                                        <h3 class="mb-0" style="color: brown;">VIEW COURSE ASSIGNMENTS</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <%- include('../../Includes/messages') %>
+                                        
+                                        <!-- Department Selection Form -->
+                                        <form action="/admin/viewCourseAssignments" method="GET">
+                                            <h6 class="heading-small text-muted mb-4">Select Department</h6>
+                                            <div class="pl-lg-4">
+                                                <div class="form-group">
+                                                    <label for="departmentId" class="form-control-label">Department</label>
+                                                    <select class="form-control" id="departmentId" name="departmentId" required>
+                                                        <option value="">Select Department</option>
+                                                        <% for (let department of departments) { %>
+                                                            <option value="<%= department.DepartmentID %>" 
+                                                                <%= department.DepartmentID == departmentId ? 'selected' : '' %> >
+                                                                <%= department.DepartmentName %>
+                                                            </option>
+                                                        <% } %>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary btn-block">View Courses</button>
+                                        </form>
+                                        <hr class="my-4">
+                                        
+                                        <!-- Display Courses and Faculty Assignment -->
+                                        <% if (coursesWithFaculty.length > 0) { %>
+                                            <h6 class="heading-small text-muted mb-4">Courses and Faculty</h6>
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Course Name</th>
+                                                            <th>Faculty Assigned</th>
+                                                            <th>Department</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <% for (let course of coursesWithFaculty) { %>
+                                                            <tr>
+                                                                <td><%= course.CourseName %></td>
+                                                                <td><%= course.FacultyName || 'No Faculty Assigned' %></td>
+                                                                <td><%= course.DepartmentName %></td>
+                                                            </tr>
+                                                        <% } %>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        <% } else { %>
+                                            <p>No courses found for the selected department.</p>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </section>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const departmentSelect = document.getElementById('departmentId');
+        
+        // If a department was selected before form submission, it will remain selected
+        const selectedDepartmentId = "<%= departmentId %>"; // Pass selected departmentId from backend
+        if (selectedDepartmentId) {
+            departmentSelect.value = selectedDepartmentId;
+        }
+    });
+</script>
+
+<%- include('../../Includes/admin_end.ejs') %>

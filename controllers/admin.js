@@ -1338,3 +1338,45 @@ exports.postAssignCourses = async (req, res, next) => {
       res.redirect('/admin/assignCourses');
   }
 };
+
+exports.getCourseAssignmentsByDepartment = async (req, res, next) => {
+  const departmentId = req.query.departmentId || null;  // Get the selected departmentId from the query string
+
+  try {
+      // Fetch all departments
+      const departments = await zeroParamPromise('SELECT * FROM departments');
+      
+      // Fetch courses and faculty assignments for the selected department (if available)
+      const coursesWithFaculty = await zeroParamPromise(`
+          SELECT 
+              courses.CourseID,
+              courses.CourseName,
+              faculty.FacultyID,
+              CONCAT(person.FirstName, " ", person.LastName) AS FacultyName,
+              departments.DepartmentName,
+              departments.DepartmentID
+          FROM courses
+          JOIN faculty_course_mapping fcm ON courses.CourseID = fcm.CourseID
+          JOIN faculty ON fcm.FacultyID = faculty.FacultyID
+          JOIN person ON person.PersonID = faculty.PersonID
+          JOIN departments ON courses.DepartmentID = departments.DepartmentID
+          ${departmentId ? `WHERE courses.DepartmentID = ${departmentId}` : ''}
+          ORDER BY departments.DepartmentName, courses.CourseName
+      `);
+
+      // Pass the departments, selected departmentId, and course assignments to the view
+      res.render('Admin/Student/viewCourseAssignments', {
+          departments: departments,
+          coursesWithFaculty: coursesWithFaculty,
+          departmentId: departmentId,  // Pass the selected departmentId to keep the dropdown selection
+          page_name: 'course_assignment'
+      });
+
+  } catch (error) {
+      console.error(error);
+      req.flash('error', 'Failed to fetch course assignments');
+      res.redirect('/admin/viewCourseAssignments');
+  }
+};
+
+
