@@ -1379,4 +1379,98 @@ exports.getCourseAssignmentsByDepartment = async (req, res, next) => {
   }
 };
 
+// 1.1 Get All Payments
+exports.getPayments = async (req, res, next) => {
+  try {
+      // SQL query to fetch all payments along with student and person details
+      const sql = `
+          SELECT 
+              payments.PaymentID, 
+              payments.PaymentDate, 
+              payments.Amount, 
+              CONCAT(person.FirstName, ' ', person.LastName) AS StudentName
+          FROM payments
+          JOIN students ON payments.StudentID = students.StudentID
+          JOIN person ON students.PersonID = person.PersonID
+          ORDER BY payments.PaymentDate DESC;
+      `;
+      const results = await zeroParamPromise(sql);
+
+      // Render the view with the payments data
+      res.render('Admin/Payments/getPayments', { 
+          payments: results, 
+          page_name: 'payment' 
+      });
+  } catch (error) {
+      console.error("Error fetching payments:", error);
+      req.flash('error', 'Failed to fetch payments.');
+      res.redirect('/admin/payments');
+  }
+};
+
+// 1.2 Get Payments by Student
+// 1.2 Get Payments by Student
+exports.getPaymentsByStudent = async (req, res, next) => {
+  const { studentID } = req.body;  // Get the selected studentID from the form
+
+  if (studentID === 'None') {
+      req.flash('error', 'Please select a student');
+      res.redirect('/admin/selectStudentForPayments'); // Redirect to the filter page if no student is selected
+  } else {
+      try {
+          // SQL query to fetch payments for a specific student
+          const sql = `
+              SELECT 
+                  payments.PaymentID, 
+                  payments.PaymentDate, 
+                  payments.Amount, 
+                  CONCAT(person.FirstName, ' ', person.LastName) AS StudentName
+              FROM payments
+              JOIN students ON payments.StudentID = students.StudentID
+              JOIN person ON students.PersonID = person.PersonID
+              WHERE students.StudentID = ?
+              ORDER BY payments.PaymentDate DESC;
+          `;
+          const results = await queryParamPromise(sql, [studentID]);
+
+          // Render the view with the filtered payments
+          res.render('Admin/Payments/getPayments', { 
+              payments: results, 
+              page_name: 'payment' 
+          });
+      } catch (error) {
+          console.error("Error fetching payments for student:", error);
+          req.flash('error', 'Failed to fetch payments for the selected student.');
+          res.redirect('/admin/payments');
+      }
+  }
+};
+
+
+// 1.3 Get All Students for the filter dropdown
+// 1.3 Get All Students for the filter dropdown
+exports.getAllStudentsP = async (req, res, next) => {
+  try {
+      // SQL query to fetch all students (with Person details)
+      const sql = `
+          SELECT 
+              students.StudentID, 
+              CONCAT(person.FirstName, ' ', person.LastName) AS StudentName
+          FROM students
+          JOIN person ON students.PersonID = person.PersonID;
+      `;
+      const students = await zeroParamPromise(sql);
+
+      // Render the view with the students data for the filter dropdown
+      res.render('Admin/Payments/filterPayments', { 
+          students: students,
+          page_name: 'payment' 
+      });
+  } catch (error) {
+      console.error("Error fetching students:", error);
+      req.flash('error', 'Failed to fetch students.');
+      res.redirect('/admin/payments');
+  }
+};
+
 

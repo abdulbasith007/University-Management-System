@@ -1,0 +1,49 @@
+<%- include('../../Includes/begin.ejs') %>
+<link rel="stylesheet" href="../../CSS/admin-dashboard.css">
+
+<div class="container-fluid">
+    <div id="wrapper">
+        <%- include('../../Includes/admin_nav.ejs') %>
+
+        <section id="content-wrapper">
+            <main role="main" class="pt-5 main">
+                <div class="main-content">
+                    <div class="header pb-4 pb-sm-8 pt-5 pt-lg-8 d-flex align-items-center" style="height: 100px; background-size: cover; background-position: center top;">
+                    </div>
+                    <div class="container-fluid mt--7">
+                        <div class="row">
+                            <div class="col-xl-12 order-xl-1">
+                                <div class="card bg-secondary shadow">
+                                    <div class="card-header bg-white border-0">
+                                        <h3 class="mb-0" style="color: brown;">FILTER PAYMENTS BY STUDENT</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <%- include('../../Includes/messages') %>
+                                        <form action="/admin/payments" method="POST">
+                                            <h6 class="heading-small text-muted mb-4">Select Student</h6>
+                                            <div class="pl-lg-4">
+                                                <div class="form-group">
+                                                    <label class="form-control-label" for="studentID">Student</label>
+                                                    <select class="form-control" id="studentID" name="studentID" required>
+                                                        <option value="None">Select a Student</option>
+                                                        <% for (const student of students) { %>
+                                                            <option value="<%= student.StudentID %>"><%= student.StudentName %></option>
+                                                        <% } %>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary btn-block">Filter Payments</button>
+                                        </form>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </section>
+    </div>
+</div>
+
+<%- include('../../Includes/admin_end.ejs') %>

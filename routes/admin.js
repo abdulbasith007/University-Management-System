@@ -163,5 +163,14 @@ router.post('/assignCourses', controller.postAssignCourses);
 
 router.get('/viewCourseAssignments', controller.getCourseAssignmentsByDepartment);
 
+// 1. View all payments
+router.get('/payments', controller.getPayments);
+
+// 2. Filter payments by student
+router.post('/payments', controller.getPaymentsByStudent);
+
+// 3. View all students for filtering
+router.get('/selectStudentForPayments', controller.getAllStudentsP);
+
 
 module.exports = router;
