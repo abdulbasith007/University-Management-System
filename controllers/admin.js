@@ -1284,3 +1284,57 @@ exports.postParentSettings = async (req, res, next) => {
       res.redirect(`/admin/settings/parent/${studentID}`);
   }
 };
+
+// 3.5 Assign Courses
+exports.getAssignCourses = async (req, res, next) => {
+  try {
+      // Fetch all courses, students, and staff
+      const courses = await zeroParamPromise('SELECT * FROM courses');
+      const students = await zeroParamPromise('SELECT StudentID, CONCAT(FirstName, " ", LastName) AS Name FROM students JOIN person ON students.PersonID = person.PersonID');
+      const staff = await zeroParamPromise('SELECT FacultyID, CONCAT(FirstName, " ", LastName) AS Name FROM faculty JOIN person ON faculty.PersonID = person.PersonID');
+      
+      // Pass staff, students, and courses to the view
+      res.render('Admin/Student/assignCourses', {
+          courses: courses,
+          students: students,
+          staff: staff,
+          page_name: 'course'
+      });
+  } catch (error) {
+      console.error(error);
+      req.flash('error', 'Error fetching data for course assignment');
+      res.redirect('Admin/Student/assignCourses');
+  }
+};
+
+
+exports.postAssignCourses = async (req, res, next) => {
+  const { assignmentType, studentId, staffId } = req.body;
+  const courses = req.body['courses[]'];
+
+  try {
+      if (assignmentType === 'student') {
+          // Assign courses to the selected student
+          const promises = courses.map(courseId => {
+              const sql = 'INSERT INTO student_course_mapping (StudentID, CourseID) VALUES (?, ?)';
+              return queryParamPromise(sql, [studentId, courseId]);
+          });
+          await Promise.all(promises);
+          req.flash('success_msg', 'Courses successfully assigned to student');
+      } else if (assignmentType === 'staff') {
+          // Assign courses to the selected staff
+          const promises = courses.map(courseId => {
+              const sql = 'INSERT INTO faculty_course_mapping (FacultyID, CourseID) VALUES (?, ?)';
+              return queryParamPromise(sql, [staffId, courseId]);
+          });
+          await Promise.all(promises);
+          req.flash('success_msg', 'Courses successfully assigned to staff');
+      }
+      
+      res.redirect('/admin/assignCourses');
+  } catch (error) {
+      console.error(error);
+      req.flash('error', 'Failed to assign courses');
+      res.redirect('/admin/assignCourses');
+  }
+};

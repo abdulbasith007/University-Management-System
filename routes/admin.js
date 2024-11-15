@@ -157,5 +157,13 @@ router.post('/addParentContact', controller.postAddParentContact);
 router.get('/settings/parent/:id', controller.getParentSettings);
 router.post('/settings/parent', controller.postParentSettings);
 
+// Add new routes for course assignment
+router.get('/assignCourses', controller.getAssignCourses);
+router.post('/assignCourses', controller.postAssignCourses); 
+router.get('/Student/assignCourses', controller.getAssignCourses);
+router.post('/Student/assignCourses', controller.postAssignCourses); 
+router.get('/Admin/Student/assignCourses', controller.getAssignCourses);
+router.post('/Admin/Student/assignCourses', controller.postAssignCourses);
+
 
 module.exports = router;

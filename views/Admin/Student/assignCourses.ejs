@@ -1,0 +1,124 @@
+<%- include('../../Includes/begin.ejs') %>
+<link rel="stylesheet" href="../../CSS/admin-dashboard.css">
+
+<div class="container-fluid">
+
+    <div id="wrapper">
+        <%- include('../../Includes/admin_nav.ejs') %>
+
+        <section id="content-wrapper">
+            <main role="main" class="pt-5 main">
+
+                <div class="main-content">
+                    <div class="header pb-4 pb-sm-8 pt-5 pt-lg-8 d-flex align-items-center"
+                        style="height: 100px; background-size: cover; background-position: center top;">
+                    </div>
+                    <div class="container-fluid mt--7">
+                        <div class="row">
+                            <div class="col-xl-12 order-xl-1">
+                                <div class="card bg-secondary shadow">
+                                    <div class="card-header bg-white border-0">
+                                        <div class="row align-items-center">
+                                            <div class="col-8">
+                                                <h3 class="mb-0" style="color: brown;">ASSIGN COURSES</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <%- include('../../Includes/messages') %>
+                                        <form action="/admin/assignCourses" method="POST">
+                                            <h6 class="heading-small text-muted mb-4">Select Assignment Type</h6>
+                                            <div class="pl-lg-4">
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label" for="assignmentType">Assign to</label>
+                                                            <select class="form-control" id="assignmentType" name="assignmentType" required>
+                                                                <option value="student">Student</option>
+                                                                <option value="staff">Staff</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <hr class="my-4">
+                                            
+                                            <!-- Dynamic Section based on Assignment Type -->
+                                            <div id="studentSection" class="assignmentSection">
+                                                <h6 class="heading-small text-muted mb-4">Select Student</h6>
+                                                <div class="pl-lg-4">
+                                                    <div class="form-group">
+                                                        <label for="studentId">Student</label>
+                                                        <select id="studentId" name="studentId" class="form-control" required>
+                                                            <% for (let student of students) { %>
+                                                                <option value="<%= student.StudentID %>"><%= student.Name %></option>
+                                                            <% } %>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div id="staffSection" class="assignmentSection" style="display: none;">
+                                                <h6 class="heading-small text-muted mb-4">Select Staff</h6>
+                                                <div class="pl-lg-4">
+                                                    <div class="form-group">
+                                                        <label for="staffId">Staff</label>
+                                                        <select id="staffId" name="staffId" class="form-control" required>
+                                                            <% for (let staffMember of staff) { %> <!-- Use a different variable name to avoid conflicts -->
+                                                                <option value="<%= staffMember.FacultyID %>"><%= staffMember.Name %></option>
+                                                            <% } %>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+
+                                            <h6 class="heading-small text-muted mb-4">Select Courses</h6>
+                                            <div class="pl-lg-4">
+                                                <div class="form-group">
+                                                    <label for="courses">Courses</label>
+                                                    <select id="courses" name="courses[]" class="form-control" multiple required>
+                                                        <% for (let course of courses) { %>
+                                                            <option value="<%= course.CourseID %>"><%= course.CourseName %></option>
+                                                        <% } %>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            
+                                            <hr class="my-4">
+                                            <button type="submit" class="btn btn-primary btn-block">Assign Courses</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </section>
+    </div>
+
+</div>
+
+<%- include('../../Includes/admin_end.ejs') %>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const assignmentTypeSelect = document.getElementById('assignmentType');
+        const studentSection = document.getElementById('studentSection');
+        const staffSection = document.getElementById('staffSection');
+        
+        assignmentTypeSelect.addEventListener('change', function() {
+            if (assignmentTypeSelect.value === 'student') {
+                studentSection.style.display = 'block';
+                staffSection.style.display = 'none';
+            } else {
+                studentSection.style.display = 'none';
+                staffSection.style.display = 'block';
+            }
+        });
+
+        // Trigger the change event initially to set the default view
+        assignmentTypeSelect.dispatchEvent(new Event('change'));
+    });
+</script>
