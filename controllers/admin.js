@@ -1430,7 +1430,7 @@ exports.getPayments = async (req, res, next) => {
           FROM payments
           JOIN students ON payments.StudentID = students.StudentID
           JOIN person ON students.PersonID = person.PersonID
-          ORDER BY payments.PaymentDate DESC;
+          ORDER BY payments.PaymentID ASC;
       `;
       const results = await zeroParamPromise(sql);
 
@@ -1510,5 +1510,53 @@ exports.getAllStudentsP = async (req, res, next) => {
       res.redirect('/admin/payments');
   }
 };
+
+// 1.4 Add New Payment
+exports.addPayment = async (req, res, next) => {
+  const { studentID, amount, paymentDate } = req.body;
+
+  try {
+      // Insert payment data into the database
+      const sql = `
+          INSERT INTO payments (StudentID, Amount, PaymentDate) 
+          VALUES (?, ?, ?)
+      `;
+      await queryParamPromise(sql, [studentID, amount, paymentDate]);
+
+      // Redirect to the payments list or show a success message
+      req.flash('success', 'Payment successfully added!');
+      res.redirect('/admin/payments');
+  } catch (error) {
+      console.error("Error adding payment:", error);
+      req.flash('error', 'Failed to add payment.');
+      res.redirect('/admin/addPayment');
+  }
+};
+
+// 1.6 Get all students for the "add payment" form
+exports.getAllStudentsForPaymentForm = async (req, res, next) => {
+  try {
+      // SQL query to fetch all students (with Person details)
+      const sql = `
+          SELECT 
+              students.StudentID, 
+              CONCAT(person.FirstName, ' ', person.LastName) AS StudentName
+          FROM students
+          JOIN person ON students.PersonID = person.PersonID;
+      `;
+      const students = await zeroParamPromise(sql);
+
+      // Render the view for adding a payment with students data
+      res.render('Admin/Payments/addPayment', { 
+          students: students,
+          page_name: 'payment' 
+      });
+  } catch (error) {
+      console.error("Error fetching students:", error);
+      req.flash('error', 'Failed to fetch students.');
+      res.redirect('/admin/payments');
+  }
+};
+
 
 

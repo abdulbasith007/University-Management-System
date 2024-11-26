@@ -177,5 +177,12 @@ router.post('/payments', controller.getPaymentsByStudent);
 // 3. View all students for filtering
 router.get('/selectStudentForPayments', controller.getAllStudentsP);
 
+// 1.4 Get the form to add a payment (show form with students)
+router.get('/addPayment', controller.getAllStudentsForPaymentForm);  // Display the form for adding payments
+
+// 1.5 Handle form submission to add payment
+router.post('/addPayment', controller.addPayment);  // Process the form and add the payment
+
+
 
 module.exports = router;
