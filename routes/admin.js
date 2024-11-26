@@ -86,7 +86,12 @@ router.get('/addScholarship', controller.getAddScholarship);
 router.post('/addScholarship', controller.postAddScholarship);
 // 8.4 Modify existing scholarships
 router.get('/settings/scholarship/:id', controller.getScholarshipSettings);
+router.post('/settings/scholarship/:id', controller.postScholarshipSettings);
 router.post('/settings/scholarship', controller.postScholarshipSettings);
+
+// Route to handle assigning scholarship to a student
+router.post('/assignScholarship', controller.assignScholarshipToStudent);
+
 
 // 9.INTERNSHIPS
 // 9.1 Get all internships

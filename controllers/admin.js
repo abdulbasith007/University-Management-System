@@ -761,31 +761,69 @@ exports.getAllScholarships = async (req, res, next) => {
 // 8.3 Modify Scholarship
 exports.getScholarshipSettings = async (req, res, next) => {
   const scholarshipID = req.params.id;
+  
+  // Fetch scholarship details
   const sql1 = 'SELECT * FROM scholarships WHERE ScholarshipID = ?';
   const scholarshipData = await queryParamPromise(sql1, [scholarshipID]);
 
-  // const results = await zeroParamPromise('SELECT FacultyAdvisorID FROM faculty');
-  // let facultyAdvisors = [];
-  // for (let i = 0; i < results.length; ++i) {
-  //     facultyAdvisors.push(results[i].FacultyAdvisorID);
-  // }
+  // Fetch students assigned to the scholarship
+  const sql2 = `SELECT s.StudentID, p.FirstName, p.LastName 
+                FROM students s
+                JOIN person p ON s.PersonID = p.PersonID
+                JOIN scholarship_student_mapping ss ON s.StudentID = ss.StudentID
+                WHERE ss.ScholarshipID = ?`;
+  const students = await queryParamPromise(sql2, [scholarshipID]);
+
+  const sql3 = `SELECT s.StudentID, p.FirstName, p.LastName 
+                FROM students s
+                JOIN person p ON s.PersonID = p.PersonID`;
+  const allStudents = await queryParamPromise(sql3);
+
+  // Fetch available faculty advisors
+  // const sql3 = 'SELECT FacultyID, CONCAT(FirstName, " ", LastName) AS Name FROM faculty NATURAL JOIN person';
+  // const facultyAdvisors = await zeroParamPromise(sql3);
 
   res.render('Admin/Scholarship/setScholarship', {
     scholarshipData: scholarshipData[0],
-    // facultyAdvisors: facultyAdvisors,
+    students: students, // Send students data to the view
+    allStudents: allStudents, // Send students data to the view
+    // facultyAdvisors: facultyAdvisors, // Send faculty data to the view
     page_name: 'Scholarship Settings',
   });
 };
 
 exports.postScholarshipSettings = async (req, res, next) => {
-  const { scholarshipID, scholarshipAmount, eligibilityCriteria, facultyAdvisorID } = req.body;
+  const { scholarshipAmount, eligibilityCriteria } = req.body;
+  const scholarshipID = req.params.id;
 
-  const sql = 'UPDATE scholarships SET Amount = ?, EligibilityCriteria = ?, FacultyAdvisorID = ? WHERE ScholarshipID = ?';
-  await queryParamPromise(sql, [scholarshipAmount, eligibilityCriteria, facultyAdvisorID, scholarshipID]);
+  // Update scholarship
+  const sql1 = 'UPDATE scholarships SET Amount = ?, EligibilityCriteria = ? WHERE ScholarshipID = ?';
+  await queryParamPromise(sql1, [scholarshipAmount, eligibilityCriteria, scholarshipID]);
 
   req.flash('success_msg', 'Scholarship updated successfully');
   res.redirect('/admin/getScholarships');
 };
+
+exports.assignScholarshipToStudent = async (req, res, next) => {
+  const { studentID, scholarshipID } = req.body;
+
+  // Check if the student is already assigned this scholarship
+  const checkSql = 'SELECT count(*) as count FROM scholarship_student_mapping WHERE StudentID = ? AND ScholarshipID = ?';
+  const count = (await queryParamPromise(checkSql, [studentID, scholarshipID]))[0].count;
+
+  if (count !== 0) {
+    req.flash('error', 'This student is already awarded the scholarship');
+    res.redirect(`/admin/settings/scholarship/${scholarshipID}`);
+  } else {
+    // Assign scholarship to the student
+    const insertSql = 'INSERT INTO scholarship_student_mapping (StudentID, ScholarshipID) VALUES (?, ?)';
+    await queryParamPromise(insertSql, [studentID, scholarshipID]);
+
+    req.flash('success_msg', 'Scholarship assigned to student successfully');
+    res.redirect(`/admin/settings/scholarship/${scholarshipID}`);
+  }
+};
+
 
 // 1.2 Get relevant scholarships based on query
 exports.getRelevantScholarship = async (req, res, next) => {

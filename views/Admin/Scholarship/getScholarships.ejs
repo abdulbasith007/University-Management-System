@@ -32,30 +32,35 @@
                                         <input class="form-control mb-4" id="searchInput" type="text" placeholder="Search Scholarships">
                                         <h6 class="heading-small text-muted mb-4">SCHOLARSHIP INFORMATION</h6>
                                         <div class="table-responsive">
-                                          <table class="table">
-                                            <thead class="thead-dark">
-                                              <tr>
-                                                <th scope="col">Scholarship ID</th>
-                                                <th scope="col">Amount</th>
-                                                <th scope="col">Eligibility Criteria</th>
-                                                <th scope="col">Manage Scholarship</th>
-                                              </tr>
-                                            </thead>
-                                            <tbody id="scholarshipTable">
-                                              <% for(var i = 0; i < data.length; i++) { %>
-                                                <tr>
-                                                  <th scope="row"><%= data[i].ScholarshipID %></th>
-                                                  <td><%= data[i].Amount %></td>
-                                                  <td><%= data[i].EligibilityCriteria %></td>
-                                                  <td>
-                                                    <a href="/admin/settings/scholarship/<%= data[i].ScholarshipID %>" class="btn btn-sm btn-primary">Settings</a>
-                                                  </td>
-                                                </tr>
-                                              <% } %>
-                                            </tbody>
-                                          </table>
+                                            <table class="table">
+                                                <thead class="thead-dark">
+                                                    <tr>
+                                                        <th scope="col">Scholarship ID</th>
+                                                        <th scope="col">Amount</th>
+                                                        <th scope="col">Eligibility Criteria</th>
+                                                        <th scope="col">Manage Scholarship</th>
+                                                        <th scope="col">View Students</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="scholarshipTable">
+                                                    <% for(var i = 0; i < data.length; i++) { %>
+                                                        <tr>
+                                                            <th scope="row"><%= data[i].ScholarshipID %></th>
+                                                            <td><%= data[i].Amount %></td>
+                                                            <td><%= data[i].EligibilityCriteria %></td>
+                                                            <td>
+                                                                <a href="/admin/settings/scholarship/<%= data[i].ScholarshipID %>" class="btn btn-sm btn-primary">Settings</a>
+                                                            </td>
+                                                            <td>
+                                                                <a href="/admin/settings/scholarship/<%= data[i].ScholarshipID %>" class="btn btn-sm btn-info">View Students</a>
+                                                            </td>
+                                                        </tr>
+                                                    <% } %>
+                                                </tbody>
+                                            </table>
                                         </div>
-                                      </div>
+                                    </div>
+                                    
                                       
                                     
                                 </div>
