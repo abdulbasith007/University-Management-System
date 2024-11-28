@@ -134,6 +134,10 @@ router.post('/addExam', controller.postAddExam);
 router.get('/settings/exam/:id', controller.getExamSettings);
 router.post('/settings/exam', controller.postExamSettings);
 
+router.get('/editExam/:id', controller.getManageExam);
+router.post('/editExam/:id', controller.postManageExam);
+
+
 // 12.ALUMNI
 // 12.1 Get all alumni
 router.get('/getAllAlumni', controller.getAllAlumni);
