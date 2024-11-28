@@ -1254,6 +1254,79 @@ exports.postManageExam = async (req, res, next) => {
 exports.getExamSettings = async (req, res, next) => { };
 exports.postExamSettings = async (req, res, next) => { };
 
+exports.getManageExam = async (req, res, next) => {
+  const examID = req.params.id;
+
+  try {
+      // Fetch exam details
+      const examSql = `SELECT ExamID, ExamDate, TotalMarks, CourseName, exams.CourseID
+                       FROM exams
+                       JOIN courses ON exams.CourseID = courses.CourseID
+                       WHERE ExamID = ?`;
+      const examDetails = (await queryParamPromise(examSql, [examID]))[0];
+
+      // Fetch students enrolled in the same course
+      const studentsSql = `
+          SELECT s.StudentID, p.FirstName, p.LastName, sem.Marks
+          FROM students s
+          JOIN person p ON s.PersonID = p.PersonID
+          JOIN student_course_mapping scm ON s.StudentID = scm.StudentID
+          LEFT JOIN student_exam_mapping sem ON s.StudentID = sem.StudentID AND sem.ExamID = ?
+          WHERE scm.CourseID = ?
+      `;
+      const students = await queryParamPromise(studentsSql, [examID, examDetails.CourseID]);
+
+      res.render('Admin/Exam/setStaff', {
+          exam: examDetails,
+          students: students,
+          data: students,
+          page_name: 'exam',
+      });
+  } catch (error) {
+      console.error("Error fetching exam or student details:", error);
+      req.flash('error', 'Failed to load exam details or student marks.');
+      res.redirect('/admin/getExams');
+  }
+};
+
+
+
+exports.postManageExam = async (req, res, next) => {
+  const examID = req.params.id;
+  const { studentID, marks } = req.body;
+
+  try {
+      // Validate input
+      if (!studentID || marks === undefined || marks < 0) {
+          req.flash('error', 'Invalid input. Marks must be non-negative.');
+          return res.redirect(`/admin/manageExam/${examID}`);
+      }
+
+      // Check if the student already has marks for the exam
+      const checkSql = `SELECT COUNT(*) AS count FROM student_exam_mapping WHERE StudentID = ? AND ExamID = ?`;
+      const exists = (await queryParamPromise(checkSql, [studentID, examID]))[0].count > 0;
+
+      if (exists) {
+          // Update marks if record exists
+          const updateSql = `UPDATE student_exam_mapping SET Marks = ? WHERE StudentID = ? AND ExamID = ?`;
+          await queryParamPromise(updateSql, [marks, studentID, examID]);
+          req.flash('success_msg', 'Marks updated successfully.');
+      } else {
+          // Insert marks if record does not exist
+          const insertSql = `INSERT INTO student_exam_mapping (StudentID, ExamID, Marks) VALUES (?, ?, ?)`;
+          await queryParamPromise(insertSql, [studentID, examID, marks]);
+          req.flash('success_msg', 'Marks added successfully.');
+      }
+
+      res.redirect(`/admin/manageExam/${examID}`);
+  } catch (error) {
+      console.error("Error updating marks:", error);
+      req.flash('error', 'Failed to add or update marks.');
+      res.redirect(`/admin/manageExam/${examID}`);
+  }
+};
+
+
 
 
 // 2. PARENT CONTACT

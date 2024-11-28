@@ -140,10 +140,19 @@ CREATE TABLE IF NOT EXISTS `Scholarship_Student_Mapping` (
 CREATE TABLE IF NOT EXISTS `Student_Course_Mapping` (
     `StudentID` INT UNSIGNED NOT NULL,
     `CourseID` INT UNSIGNED NOT NULL,
-    `Marks` INT,
+    `Marks` INT CHECK (Marks >= 0),
     PRIMARY KEY (`StudentID`, `CourseID`),
     FOREIGN KEY (`StudentID`) REFERENCES `Students`(`StudentID`) ON UPDATE CASCADE ON DELETE RESTRICT,
     FOREIGN KEY (`CourseID`) REFERENCES `Courses`(`CourseID`) ON UPDATE CASCADE ON DELETE RESTRICT
+);
+
+CREATE TABLE IF NOT EXISTS `Student_Exam_Mapping` (
+    `StudentID` INT UNSIGNED NOT NULL,
+    `ExamID` INT UNSIGNED NOT NULL,
+    `Marks` INT,
+    PRIMARY KEY (`StudentID`, `ExamID`),
+    FOREIGN KEY (`StudentID`) REFERENCES `Students`(`StudentID`) ON UPDATE CASCADE ON DELETE RESTRICT,
+    FOREIGN KEY (`ExamID`) REFERENCES `Exams`(`ExamID`) ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
 CREATE TABLE IF NOT EXISTS `Student_Internship_Mapping` (

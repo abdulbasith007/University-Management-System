@@ -134,6 +134,7 @@ router.post('/addExam', controller.postAddExam);
 router.get('/settings/exam/:id', controller.getExamSettings);
 router.post('/settings/exam', controller.postExamSettings);
 
+// 11.5 View and manage student marks for an exam
 router.get('/editExam/:id', controller.getManageExam);
 router.post('/editExam/:id', controller.postManageExam);
 
