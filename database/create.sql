@@ -204,3 +204,12 @@ END;
 //
 
 DELIMITER ;
+
+-- Add index for filtering staff by department
+CREATE INDEX idx_faculty_department ON Faculty(DepartmentID);
+
+-- Add index for filtering students by courses
+CREATE INDEX idx_student_course ON Student_Course_Mapping(CourseID);
+
+-- Add index for filtering courses by department
+CREATE INDEX idx_course_department ON Courses(DepartmentID);
