@@ -167,3 +167,25 @@ INSERT INTO Student_Club_Mapping (StudentID, ClubID) VALUES
 INSERT INTO Student_Course_Mapping (StudentID, CourseID, Marks) VALUES
 (1, 1, 85), (2, 2, 90), (3, 3, 88), (4, 4, 92), (5, 5, 87),
 (6, 6, 89), (7, 7, 94), (8, 8, 86), (9, 9, 93), (10, 10, 91);
+
+INSERT INTO Student_Exam_Mapping (StudentID, ExamID, Marks) VALUES
+(1, 1, 85),
+(1, 2, 78),
+(2, 3, 90),
+(2, 4, 88),
+(3, 5, 92),
+(3, 6, 87),
+(4, 7, 80),
+(4, 8, 85),
+(5, 9, 88),
+(5, 10, 93),
+(6, 1, 75),
+(6, 2, 68),
+(7, 3, 81),
+(7, 4, 85),
+(8, 5, 89),
+(8, 6, 78),
+(9, 7, 77),
+(9, 8, 84),
+(10, 9, 80),
+(10, 10, 88);
