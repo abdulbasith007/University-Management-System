@@ -41,7 +41,6 @@
                                                         <th scope="col">Date Of Birth</th>
                                                         <th scope="col">City</th>
                                                         <th scope="col">State</th>
-                                                        <th scope="col">Manage Student</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="studentTable">
@@ -53,7 +52,6 @@
                                                             <td><%= data[i].DateOfBirth %></td>
                                                             <td><%= data[i].City %></td>
                                                             <td><%= data[i].State %></td>
-                                                            <td><a href="/admin/settings/student/<%= data[i].Email %>" class="btn btn-sm btn-primary">Settings</a></td>
                                                         </tr>
                                                     <% } %>
                                                 </tbody>

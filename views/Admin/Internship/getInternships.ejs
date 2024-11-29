@@ -40,7 +40,6 @@
                                                 <th scope="col">Company Name</th>
                                                 <th scope="col">Duration</th>
                                                 <th scope="col">Stipend</th>
-                                                <th scope="col">Manage Internship</th>
                                               </tr>
                                             </thead>
                                             <tbody id="internshipTable">
@@ -51,9 +50,6 @@
                                                   <td><%= data[i].CompanyName %></td>
                                                   <td><%= data[i].Duration %></td>
                                                   <td><%= data[i].Stipend %></td>
-                                                  <td>
-                                                    <a href="/admin/settings/internship/<%= data[i].InternshipID %>" class="btn btn-sm btn-primary">Settings</a>
-                                                  </td>
                                                 </tr>
                                               <% } %>
                                             </tbody>

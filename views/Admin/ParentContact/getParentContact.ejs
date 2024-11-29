@@ -39,7 +39,6 @@
                                                         <th scope="col">Phone Number</th>
                                                         <th scope="col">Relationship</th>
                                                         <th scope="col">Student Name</th>
-                                                        <th scope="col">Manage Parent Contact</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="parentTable">
@@ -49,9 +48,6 @@
                                                         <td><%= data[i].PhoneNumber %></td>
                                                         <td><%= data[i].Relationship %></td>
                                                         <td><%= data[i].StudentName %></td>
-                                                        <td><a href="/admin/settings/parent/<%= data[i].StudentID %>"
-                                                               class="btn btn-sm btn-primary">Settings</a>
-                                                        </td>
                                                     </tr>
                                                     <% } %>
                                                 </tbody>

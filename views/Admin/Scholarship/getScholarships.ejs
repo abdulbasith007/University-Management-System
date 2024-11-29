@@ -38,7 +38,6 @@
                                                         <th scope="col">Scholarship ID</th>
                                                         <th scope="col">Amount</th>
                                                         <th scope="col">Eligibility Criteria</th>
-                                                        <th scope="col">Manage/Award Scholarship</th>
                                                         <!-- <th scope="col">View Students</th> -->
                                                     </tr>
                                                 </thead>
@@ -48,9 +47,6 @@
                                                             <th scope="row"><%= data[i].ScholarshipID %></th>
                                                             <td><%= data[i].Amount %></td>
                                                             <td><%= data[i].EligibilityCriteria %></td>
-                                                            <td>
-                                                                <a href="/admin/settings/scholarship/<%= data[i].ScholarshipID %>" class="btn btn-sm btn-primary">Settings</a>
-                                                            </td>
                                                             <!-- <td>
                                                                 <a href="/admin/settings/scholarship/<%= data[i].ScholarshipID %>" class="btn btn-sm btn-info">View Students</a>
                                                             </td> -->

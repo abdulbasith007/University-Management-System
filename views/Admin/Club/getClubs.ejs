@@ -39,7 +39,6 @@
                                                         <th scope="col">Club Name</th>
                                                         <th scope="col">Description</th>
                                                         <th scope="col">Faculty Advisor</th>
-                                                        <th scope="col">Manage Club</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="clubTable">
@@ -49,9 +48,6 @@
                                                             <td><%= data[i].ClubName %></td>
                                                             <td><%= data[i].Description %></td>
                                                             <td><%= data[i].Name %></td>
-                                                            <td>
-                                                                <a href="/admin/settings/club/<%= data[i].ClubID %>" class="btn btn-sm btn-primary">Settings</a>
-                                                            </td>
                                                         </tr>
                                                     <% } %>
                                                 </tbody>

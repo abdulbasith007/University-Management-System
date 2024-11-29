@@ -41,7 +41,6 @@
                                                         <th scope="col">Name</th>
                                                         <th scope="col">Date Of Birth</th>
                                                         <th scope="col">Dept Name</th>
-                                                        <th scope="col">Manage Staff</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="staffTable">
@@ -61,9 +60,6 @@
                                                         </td>
                                                         <td>
                                                             <%= data[i].DepartmentName %>
-                                                        </td>
-                                                        <td><a href="/admin/settings/staff/<%= data[i].email %>"
-                                                                class="btn btn-sm btn-primary">Settings</a>
                                                         </td>
                                                     </tr>
                                                     <% } %>

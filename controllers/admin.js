@@ -357,11 +357,11 @@ exports.getAllStudents = async (req, res, next) => {
 // 3.4 Modify existing students
 exports.getStudentSettings = async (req, res, next) => {
   const studentEmail = req.params.id;
-  const sql1 = 'SELECT * FROM STUDENT WHERE email = ?';
+  const sql1 = 'SELECT * FROM PERSON WHERE email = ?';
   const studentData = await queryParamPromise(sql1, [studentEmail]);
-  const address = studentData[0].s_address.split('-');
+  const address = "123";
   studentData[0].address = address;
-  const results = await zeroParamPromise('SELECT * from department');
+  const results = await zeroParamPromise('SELECT * from departments');
   let departments = [];
   for (let i = 0; i < results.length; ++i) {
     departments.push(results[i].dept_id);
@@ -1254,40 +1254,6 @@ exports.postManageExam = async (req, res, next) => {
 exports.getExamSettings = async (req, res, next) => { };
 exports.postExamSettings = async (req, res, next) => { };
 
-exports.getManageExam = async (req, res, next) => {
-  const examID = req.params.id;
-
-  try {
-      // Fetch exam details
-      const examSql = `SELECT ExamID, ExamDate, TotalMarks, CourseName, exams.CourseID
-                       FROM exams
-                       JOIN courses ON exams.CourseID = courses.CourseID
-                       WHERE ExamID = ?`;
-      const examDetails = (await queryParamPromise(examSql, [examID]))[0];
-
-      // Fetch students enrolled in the same course
-      const studentsSql = `
-          SELECT s.StudentID, p.FirstName, p.LastName, sem.Marks
-          FROM students s
-          JOIN person p ON s.PersonID = p.PersonID
-          JOIN student_course_mapping scm ON s.StudentID = scm.StudentID
-          LEFT JOIN student_exam_mapping sem ON s.StudentID = sem.StudentID AND sem.ExamID = ?
-          WHERE scm.CourseID = ?
-      `;
-      const students = await queryParamPromise(studentsSql, [examID, examDetails.CourseID]);
-
-      res.render('Admin/Exam/setStaff', {
-          exam: examDetails,
-          students: students,
-          data: students,
-          page_name: 'exam',
-      });
-  } catch (error) {
-      console.error("Error fetching exam or student details:", error);
-      req.flash('error', 'Failed to load exam details or student marks.');
-      res.redirect('/admin/getExams');
-  }
-};
 
 
 
